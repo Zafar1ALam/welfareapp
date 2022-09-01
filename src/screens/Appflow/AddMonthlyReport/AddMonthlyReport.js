@@ -5,7 +5,7 @@ import {
     TextInput, View
 } from 'react-native';
 import LeftArrow from 'react-native-vector-icons/MaterialIcons';
-import { HelperText, TouchableRipple } from 'react-native-paper'
+import { HelperText, TouchableRipple, ActivityIndicator } from 'react-native-paper'
 import HeaderGoBackCenterText from '../../../components/headergobackcentertext/HeaderGoBackCenterText';
 import { fontFamily } from '../../../constants/fonts';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -19,7 +19,37 @@ import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-nat
 import CustomBottomSheet from '../../../components/custombottomsheet/CustomBottomSheet';
 import { updateLocale } from 'moment';
 import STYLES from '../../../STYLES/STYLES';
+import { useEffect } from 'react';
+import { getAsyncUserData } from '../../../utils/axioshelper/AxiosHelper';
 const AddMonthlyReport = (props) => {
+    const [stateuserData, setStateUserData] = useState();
+    const [stateActivityIndicatorBody, setStateActivityIndicatorBody] = useState(false)
+
+    useEffect(() => {
+
+        const getsinglevalue = async () => {
+
+            try {
+                setStateActivityIndicatorBody(true)
+                const responseAsync = await getAsyncUserData()
+                console.log('jhgfgh')
+                console.log(responseAsync.city)
+                setStateAreaNumber(responseAsync.city)
+
+                // setStateAreaNumber('KJHGHJK')
+                setStateActivityIndicatorBody(false)
+            }
+            catch (err) {
+                setStateActivityIndicatorBody(false)
+                alert(err)
+            }
+        }
+
+        getsinglevalue()
+
+    }, [])
+
+
     const [border1, setBorder1] = useState('#bec5d1');
     const [border2, setBorder2] = useState('#bec5d1');
     const [border3, setBorder3] = useState('#bec5d1');
@@ -257,619 +287,633 @@ const AddMonthlyReport = (props) => {
                     }} />
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}
-
-            >
-
-
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>Area Number</Text>
-                    <TextInput
-                        placeholder='Enter Area Number'
-                        style={[styles.txtinput1, { borderColor: border1 }]}
-                        onFocus={() => setBorder1(appColor.appColorGreen)}
-                        onBlur={() => setBorder1('#bec5d1')}
-                        blurOnSubmit={true}
-                        value={stateAreaNumber}
-                        onChangeText={(text) => {
-                            setStateAreaNumber(text)
-                            setShowAreaNumbers(true)
-
-
-                        }}
-                    />
-                    {
-                        showAreaNumber || (
-                            <HelperText visible={!showAreaNumber} type="error" >
-                                please enter area number
-                            </HelperText>
-                        )
-                    }
+            {stateActivityIndicatorBody
+                ?
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <ActivityIndicator
+                        animating={stateActivityIndicatorBody} color={'#32B768'} />
                 </View>
+                :
 
 
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>Lifetime Members</Text>
+                <ScrollView showsVerticalScrollIndicator={false}
 
+                >
 
 
 
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border2 }]}
-                        onFocus={() => setBorder2(appColor.appColorGreen)}
-                        onBlur={() => setBorder2('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Lifetime Members Target'
-                        value={stateLifeTimeMembersTarget}
-                        onChangeText={(text) => {
-                            setStateLifeTimeMembersTarget(text)
-                            setShowLifeTimeMembersTargets(true)
-                        }}
-                    />
-                    {
-                        showLifeTimeMembersTargets || (
-                            <HelperText visible={!showLifeTimeMembersTargets} type="error" >
-                                please enter a life time members targets
-                            </HelperText>
-                        )
-                    }
 
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border3 }]}
-                        onFocus={() => setBorder3(appColor.appColorGreen)}
-                        onBlur={() => setBorder3('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Target Archieved'
-                        value={stateLifeTimeMembersArchived}
-                        onChangeText={(text) => {
-                            setStateLifeTimeMembersArchived(text)
-                            setShowLifeTimeMembersArchived(true)
-                        }}
-                    />
-                    {
-                        showLifeTimeMembersArchived || (
-                            <HelperText visible={!showLifeTimeMembersArchived} type="error" >
-                                please enter a target archived
-                            </HelperText>
-                        )
-                    }
-                </View>
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>Area Number</Text>
+                        <TextInput
+                            placeholder='Enter Area Number'
+                            style={[styles.txtinput1, { borderColor: border1 }]}
+                            onFocus={() => setBorder1(appColor.appColorGreen)}
+                            onBlur={() => setBorder1('#bec5d1')}
+                            blurOnSubmit={true}
+                            value={stateAreaNumber}
+                            onChangeText={(text) => {
+                                setStateAreaNumber(text)
+                                setShowAreaNumbers(true)
 
 
-
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>Regular Members</Text>
-
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border4 }]}
-                        onFocus={() => setBorder4(appColor.appColorGreen)}
-                        onBlur={() => setBorder4('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Regular Members Target'
-                        value={stateRegularMembersTarget}
-                        onChangeText={(text) => {
-                            setStateRegularMembersTarget(text)
-                            setShowRegularMembersTargets(true)
-                        }}
-                    />
-                    {
-                        showRegularMembersTargets
-                        || (
-                            <HelperText visible={!showRegularMembersTargets} type="error" >
-                                please enter a regular  Members Targets
-                            </HelperText>
-                        )
-                    }
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border5 }]}
-                        onFocus={() => setBorder5(appColor.appColorGreen)}
-                        onBlur={() => setBorder5('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Target Archieved'
-                        value={stateRegularMembersArchived}
-                        onChangeText={(text) => {
-                            setStateRegularMembersArchived(text)
-                            setShowRegularMembersArchived(true)
-                        }}
-                    />
-                    {
-                        showRegularMembersArchived || (
-                            <HelperText visible={!showRegularMembersArchived} type="error" >
-                                please enter a target archived
-                            </HelperText>
-                        )
-                    }
-
-
-
-                </View>
-
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>Restoration of Defaulters</Text>
-
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border6 }]}
-                        onFocus={() => setBorder6(appColor.appColorGreen)}
-                        onBlur={() => setBorder6('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Restoration Of Defaulters'
-                        value={stateRestorationOfDefaultersTarget}
-                        onChangeText={(text) => {
-                            setStateRestorationOfDefaultersTarget(text)
-                            setShowRestorationOfDefaultersTargets(true)
-                        }}
-                    />
-                    {
-                        showRestorationOfDefaultersTargets || (
-                            <HelperText visible={!showRestorationOfDefaultersTargets} type="error" >
-                                please enter a restoration of defaulters targets
-                            </HelperText>
-                        )
-                    }
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border7 }]}
-                        onFocus={() => setBorder7(appColor.appColorGreen)}
-                        onBlur={() => setBorder7('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Target Archieved'
-                        value={stateRestorationOfDefaultersArchived}
-                        onChangeText={(text) => {
-                            setStateRestorationOfDefaultersArchived(text)
-                            setShowRestorationOfDefaultersArchived(true)
-                        }}
-                    />
-                    {
-                        showRestorationOfDefaultersArchived || (
-                            <HelperText visible={!showRestorationOfDefaultersArchived} type="error" >
-                                please enter a target archived
-                            </HelperText>
-                        )
-                    }
-                </View>
-
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>Membership Amount</Text>
-
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border8 }]}
-                        onFocus={() => setBorder8(appColor.appColorGreen)}
-                        onBlur={() => setBorder8('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Membership Amount'
-                        value={stateMembershipAmountTarget}
-                        onChangeText={(text) => {
-                            setStateMembershipAmountTarget(text)
-                            setShowMembershipAmountTargets(true)
-                        }}
-                    />
-                    {
-                        showMembershipAmountTargets || (
-                            <HelperText visible={!showMembershipAmountTargets} type="error" >
-                                please enter a membershp amount targets
-                            </HelperText>
-                        )
-                    }
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border9 }]}
-                        onFocus={() => setBorder9(appColor.appColorGreen)}
-                        onBlur={() => setBorder9('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Target Archieved'
-                        value={stateMembershipAmountArchived}
-                        onChangeText={(text) => {
-                            setStateMembershipAmountArchived(text)
-                            setShowMembershipAmountArchived(true)
-                        }}
-                    />
-                    {
-                        showMembershipAmountArchived || (
-                            <HelperText visible={!showMembershipAmountArchived} type="error" >
-                                please enter a target archived
-                            </HelperText>
-                        )
-                    }
-                </View>
-
-
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>New Ucs</Text>
-
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border11 }]}
-                        onFocus={() => setBorder11(appColor.appColorGreen)}
-                        onBlur={() => setBorder11('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter  New Ucs'
-                        value={stateNewUcsTarget}
-                        onChangeText={(text) => {
-                            setStateNewUcsTarget(text)
-                            setShowNewUcsTargets(true)
-                        }}
-                    />
-                    {
-                        showNewUcsTargets || (
-                            <HelperText visible={!showNewUcsTargets} type="error" >
-                                please enter a new ucs
-                            </HelperText>
-                        )
-                    }
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border12 }]}
-                        onFocus={() => setBorder12(appColor.appColorGreen)}
-                        onBlur={() => setBorder12('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Target Archieved'
-                        value={stateNewUcsArchived}
-                        onChangeText={(text) => {
-                            setStateNewUcsArchived(text)
-                            setShowNewUcsArchived(true)
-                        }}
-                    />
-                    {
-                        showNewUcsArchived || (
-                            <HelperText visible={!showNewUcsArchived} type="error" >
-                                please enter a target archived
-                            </HelperText>
-                        )
-                    }
-                </View>
-
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>New Unit</Text>
-
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border13 }]}
-                        onFocus={() => setBorder13(appColor.appColorGreen)}
-                        onBlur={() => setBorder13('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter  New Unit'
-                        value={stateNewUnitTarget}
-                        onChangeText={(text) => {
-                            setStateNewUnitTarget(text)
-                            setShowNewUnitTargets(true)
-                        }}
-                    />
-                    {
-                        showNewUnitTargets || (
-                            <HelperText visible={!showNewUnitTargets} type="error" >
-                                please enter a new unit
-                            </HelperText>
-                        )
-                    }
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border14 }]}
-                        onFocus={() => setBorder14(appColor.appColorGreen)}
-                        onBlur={() => setBorder14('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Target Archieved'
-                        value={stateNewUcsArchived}
-                        onChangeText={(text) => {
-                            setStateNewUcsArchived(text)
-                            setShowNewUcsArchived(true)
-                        }}
-                    />
-                    {
-                        showNewUcsArchived || (
-                            <HelperText visible={!showNewUcsArchived} type="error" >
-                                please enter a target archived
-                            </HelperText>
-                        )
-                    }
-                </View>
-
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>Monthly Quran Circle</Text>
-
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border15 }]}
-                        onFocus={() => setBorder15(appColor.appColorGreen)}
-                        onBlur={() => setBorder15('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter  Monthly Quran Circle'
-                        value={stateMonthlyQuranCircleTarget}
-                        onChangeText={(text) => {
-                            setStateMonthlyQuranCircleTarget(text)
-                            setShowMonthlyQuranCircleTargets(true)
-                        }}
-                    />
-                    {
-                        showMonthlyQuranCircleTargets || (
-                            <HelperText visible={!showMonthlyQuranCircleTargets} type="error" >
-                                please enter a monthly quran circle
-                            </HelperText>
-                        )
-                    }
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border16 }]}
-                        onFocus={() => setBorder16(appColor.appColorGreen)}
-                        onBlur={() => setBorder16('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Target Archieved'
-                        value={stateMonthlyQuranCircleArchived}
-                        onChangeText={(text) => {
-                            setStateMonthlyQuranCircleArchived(text)
-                            setShowMonthlyQuranCircleArchived(true)
-                        }}
-                    />
-                    {
-                        showMonthlyQuranCircleArchived || (
-                            <HelperText visible={!showMonthlyQuranCircleArchived} type="error" >
-                                please enter a target archived
-                            </HelperText>
-                        )
-                    }
-                </View>
-
-
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>Monthly Darood Circle</Text>
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border17 }]}
-                        onFocus={() => setBorder17(appColor.appColorGreen)}
-                        onBlur={() => setBorder17('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter  Monthly Darood Circle'
-                        value={stateMonthlyDaroodCircleTarget}
-                        onChangeText={(text) => {
-                            setStateMonthlyDaroodCircleTarget(text)
-                            setShowMonthlyDaroodCircleTargets(true)
-                        }}
-                    />
-                    {
-                        showMonthlyDaroodCircleTargets || (
-                            <HelperText visible={!showMonthlyDaroodCircleTargets} type="error" >
-                                please enter a monthly darood circle
-                            </HelperText>
-                        )
-                    }
-
-
-                    <TextInput
-                        style={[styles.txtinput1, { borderColor: border18 }]}
-                        onFocus={() => setBorder18(appColor.appColorGreen)}
-                        onBlur={() => setBorder18('#bec5d1')}
-                        blurOnSubmit={true}
-                        placeholder='Enter Target Archieved'
-                        value={stateMonthlyDaroodCircleArchived}
-                        onChangeText={(text) => {
-                            setStateMonthlyDaroodCircleArchived(text)
-                            setShowMonthlyDaroodCircleArchived(true)
-                        }}
-                    />
-                    {
-                        showMonthlyDaroodCircleArchived || (
-                            <HelperText visible={!showMonthlyDaroodCircleArchived} type="error" >
-                                please enter a target archived
-                            </HelperText>
-                        )
-                    }
-                </View>
-
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>Monthly Meeting</Text>
-
-                    <TouchableRipple style={{
-                        flexDirection: 'row',
-                        //backgroundColor: 'red',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        borderWidth: 1,
-                        marginTop: '5%',
-                        height: 50,
-                        backgroundColor: '#fff',
-                        paddingHorizontal: '5%',
-                        borderRadius: responsiveWidth(4),
-                        borderColor: '#bec5d1'
-                    }} onPress={() => refRBSheetCustomBottomSheetMonthlyMeeting.current.open()}
-                    >
-                        <>
-                            <View style={{
-                                height: 50,
-                                justifyContent: 'center',
-                                flex: 1,
-                                //      backgroundColor: 'red'
-                            }}>
-                                <Text style={{
-
-                                    fontSize: responsiveFontSize(2),
-                                    fontFamily: fontFamily.appTextRegular,
-                                }}>
-                                    {stateMonthlyMeeting}</Text>
-
-                            </View>
-                            <AntDesign name='down'
-                                size={24} style={{ marginRight: '3%' }} />
-
-                        </>
-                    </TouchableRipple>
-
-
-                    {
-                        showMonthlyMeeting || (
-                            <HelperText visible={!showMonthlyMeeting} type="error" >
-                                please enter a monthly meeting
-                            </HelperText>
-                        )
-                    }
-                </View>
-
-                <View style={{ marginTop: '10%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>Training Session</Text>
-
-                    <TouchableRipple style={{
-                        flexDirection: 'row',
-                        //backgroundColor: 'red',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        borderWidth: 1,
-                        marginTop: '5%',
-                        height: 50,
-                        backgroundColor: '#fff',
-                        paddingHorizontal: '5%',
-                        borderRadius: responsiveWidth(4),
-                        borderColor: '#bec5d1'
-                    }} onPress={() => refRBSheetCustomBottomSheetTrainingSession.current.open()}
-                    >
-                        <>
-                            <View style={{
-                                height: 50,
-                                justifyContent: 'center',
-                                flex: 1,
-                                //      backgroundColor: 'red'
-                            }}>
-                                <Text style={{
-
-                                    fontSize: responsiveFontSize(2),
-                                    fontFamily: fontFamily.appTextRegular,
-                                }}>
-                                    {stateTrainingSession}</Text>
-
-                            </View>
-                            <AntDesign name='down'
-                                size={24} style={{ marginRight: '3%' }} />
-
-                        </>
-                    </TouchableRipple>
-
-
-                    {
-                        showTrainingSession || (
-                            <HelperText visible={!showTrainingSession} type="error" >
-                                please enter a training session
-                            </HelperText>
-                        )
-                    }
-                </View>
-
-
-
-                <View style={{ marginTop: '10%' }}>
-                    <LoaderButtonRnPaper
-                        onPress={
-                            () => {
-                                update()
-                            }
+                            }}
+                        />
+                        {
+                            showAreaNumber || (
+                                <HelperText visible={!showAreaNumber} type="error" >
+                                    please enter area number
+                                </HelperText>
+                            )
                         }
-                        loading={isLoading}
-                        label="Update"
+                    </View>
+
+
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>Lifetime Members</Text>
+
+
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border2 }]}
+                            onFocus={() => setBorder2(appColor.appColorGreen)}
+                            onBlur={() => setBorder2('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Lifetime Members Target'
+                            value={stateLifeTimeMembersTarget}
+                            onChangeText={(text) => {
+                                setStateLifeTimeMembersTarget(text)
+                                setShowLifeTimeMembersTargets(true)
+                            }}
+                        />
+                        {
+                            showLifeTimeMembersTargets || (
+                                <HelperText visible={!showLifeTimeMembersTargets} type="error" >
+                                    please enter a life time members targets
+                                </HelperText>
+                            )
+                        }
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border3 }]}
+                            onFocus={() => setBorder3(appColor.appColorGreen)}
+                            onBlur={() => setBorder3('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Target Archieved'
+                            value={stateLifeTimeMembersArchived}
+                            onChangeText={(text) => {
+                                setStateLifeTimeMembersArchived(text)
+                                setShowLifeTimeMembersArchived(true)
+                            }}
+                        />
+                        {
+                            showLifeTimeMembersArchived || (
+                                <HelperText visible={!showLifeTimeMembersArchived} type="error" >
+                                    please enter a target archived
+                                </HelperText>
+                            )
+                        }
+                    </View>
+
+
+
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>Regular Members</Text>
+
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border4 }]}
+                            onFocus={() => setBorder4(appColor.appColorGreen)}
+                            onBlur={() => setBorder4('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Regular Members Target'
+                            value={stateRegularMembersTarget}
+                            onChangeText={(text) => {
+                                setStateRegularMembersTarget(text)
+                                setShowRegularMembersTargets(true)
+                            }}
+                        />
+                        {
+                            showRegularMembersTargets
+                            || (
+                                <HelperText visible={!showRegularMembersTargets} type="error" >
+                                    please enter a regular  Members Targets
+                                </HelperText>
+                            )
+                        }
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border5 }]}
+                            onFocus={() => setBorder5(appColor.appColorGreen)}
+                            onBlur={() => setBorder5('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Target Archieved'
+                            value={stateRegularMembersArchived}
+                            onChangeText={(text) => {
+                                setStateRegularMembersArchived(text)
+                                setShowRegularMembersArchived(true)
+                            }}
+                        />
+                        {
+                            showRegularMembersArchived || (
+                                <HelperText visible={!showRegularMembersArchived} type="error" >
+                                    please enter a target archived
+                                </HelperText>
+                            )
+                        }
+
+
+
+                    </View>
+
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>Restoration of Defaulters</Text>
+
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border6 }]}
+                            onFocus={() => setBorder6(appColor.appColorGreen)}
+                            onBlur={() => setBorder6('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Restoration Of Defaulters'
+                            value={stateRestorationOfDefaultersTarget}
+                            onChangeText={(text) => {
+                                setStateRestorationOfDefaultersTarget(text)
+                                setShowRestorationOfDefaultersTargets(true)
+                            }}
+                        />
+                        {
+                            showRestorationOfDefaultersTargets || (
+                                <HelperText visible={!showRestorationOfDefaultersTargets} type="error" >
+                                    please enter a restoration of defaulters targets
+                                </HelperText>
+                            )
+                        }
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border7 }]}
+                            onFocus={() => setBorder7(appColor.appColorGreen)}
+                            onBlur={() => setBorder7('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Target Archieved'
+                            value={stateRestorationOfDefaultersArchived}
+                            onChangeText={(text) => {
+                                setStateRestorationOfDefaultersArchived(text)
+                                setShowRestorationOfDefaultersArchived(true)
+                            }}
+                        />
+                        {
+                            showRestorationOfDefaultersArchived || (
+                                <HelperText visible={!showRestorationOfDefaultersArchived} type="error" >
+                                    please enter a target archived
+                                </HelperText>
+                            )
+                        }
+                    </View>
+
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>Membership Amount</Text>
+
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border8 }]}
+                            onFocus={() => setBorder8(appColor.appColorGreen)}
+                            onBlur={() => setBorder8('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Membership Amount'
+                            value={stateMembershipAmountTarget}
+                            onChangeText={(text) => {
+                                setStateMembershipAmountTarget(text)
+                                setShowMembershipAmountTargets(true)
+                            }}
+                        />
+                        {
+                            showMembershipAmountTargets || (
+                                <HelperText visible={!showMembershipAmountTargets} type="error" >
+                                    please enter a membershp amount targets
+                                </HelperText>
+                            )
+                        }
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border9 }]}
+                            onFocus={() => setBorder9(appColor.appColorGreen)}
+                            onBlur={() => setBorder9('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Target Archieved'
+                            value={stateMembershipAmountArchived}
+                            onChangeText={(text) => {
+                                setStateMembershipAmountArchived(text)
+                                setShowMembershipAmountArchived(true)
+                            }}
+                        />
+                        {
+                            showMembershipAmountArchived || (
+                                <HelperText visible={!showMembershipAmountArchived} type="error" >
+                                    please enter a target archived
+                                </HelperText>
+                            )
+                        }
+                    </View>
+
+
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>New Ucs</Text>
+
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border11 }]}
+                            onFocus={() => setBorder11(appColor.appColorGreen)}
+                            onBlur={() => setBorder11('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter  New Ucs'
+                            value={stateNewUcsTarget}
+                            onChangeText={(text) => {
+                                setStateNewUcsTarget(text)
+                                setShowNewUcsTargets(true)
+                            }}
+                        />
+                        {
+                            showNewUcsTargets || (
+                                <HelperText visible={!showNewUcsTargets} type="error" >
+                                    please enter a new ucs
+                                </HelperText>
+                            )
+                        }
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border12 }]}
+                            onFocus={() => setBorder12(appColor.appColorGreen)}
+                            onBlur={() => setBorder12('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Target Archieved'
+                            value={stateNewUcsArchived}
+                            onChangeText={(text) => {
+                                setStateNewUcsArchived(text)
+                                setShowNewUcsArchived(true)
+                            }}
+                        />
+                        {
+                            showNewUcsArchived || (
+                                <HelperText visible={!showNewUcsArchived} type="error" >
+                                    please enter a target archived
+                                </HelperText>
+                            )
+                        }
+                    </View>
+
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>New Unit</Text>
+
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border13 }]}
+                            onFocus={() => setBorder13(appColor.appColorGreen)}
+                            onBlur={() => setBorder13('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter  New Unit'
+                            value={stateNewUnitTarget}
+                            onChangeText={(text) => {
+                                setStateNewUnitTarget(text)
+                                setShowNewUnitTargets(true)
+                            }}
+                        />
+                        {
+                            showNewUnitTargets || (
+                                <HelperText visible={!showNewUnitTargets} type="error" >
+                                    please enter a new unit
+                                </HelperText>
+                            )
+                        }
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border14 }]}
+                            onFocus={() => setBorder14(appColor.appColorGreen)}
+                            onBlur={() => setBorder14('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Target Archieved'
+                            value={stateNewUcsArchived}
+                            onChangeText={(text) => {
+                                setStateNewUcsArchived(text)
+                                setShowNewUcsArchived(true)
+                            }}
+                        />
+                        {
+                            showNewUnitArchived || (
+                                <HelperText visible={!showNewUnitArchived} type="error" >
+                                    please enter a target archived
+                                </HelperText>
+                            )
+                        }
+                    </View>
+
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>Monthly Quran Circle</Text>
+
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border15 }]}
+                            onFocus={() => setBorder15(appColor.appColorGreen)}
+                            onBlur={() => setBorder15('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter  Monthly Quran Circle'
+                            value={stateMonthlyQuranCircleTarget}
+                            onChangeText={(text) => {
+                                setStateMonthlyQuranCircleTarget(text)
+                                setShowMonthlyQuranCircleTargets(true)
+                            }}
+                        />
+                        {
+                            showMonthlyQuranCircleTargets || (
+                                <HelperText visible={!showMonthlyQuranCircleTargets} type="error" >
+                                    please enter a monthly quran circle
+                                </HelperText>
+                            )
+                        }
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border16 }]}
+                            onFocus={() => setBorder16(appColor.appColorGreen)}
+                            onBlur={() => setBorder16('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Target Archieved'
+                            value={stateMonthlyQuranCircleArchived}
+                            onChangeText={(text) => {
+                                setStateMonthlyQuranCircleArchived(text)
+                                setShowMonthlyQuranCircleArchived(true)
+                            }}
+                        />
+                        {
+                            showMonthlyQuranCircleArchived || (
+                                <HelperText visible={!showMonthlyQuranCircleArchived} type="error" >
+                                    please enter a target archived
+                                </HelperText>
+                            )
+                        }
+                    </View>
+
+
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>Monthly Darood Circle</Text>
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border17 }]}
+                            onFocus={() => setBorder17(appColor.appColorGreen)}
+                            onBlur={() => setBorder17('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter  Monthly Darood Circle'
+                            value={stateMonthlyDaroodCircleTarget}
+                            onChangeText={(text) => {
+                                setStateMonthlyDaroodCircleTarget(text)
+                                setShowMonthlyDaroodCircleTargets(true)
+                            }}
+                        />
+                        {
+                            showMonthlyDaroodCircleTargets || (
+                                <HelperText visible={!showMonthlyDaroodCircleTargets} type="error" >
+                                    please enter a monthly darood circle
+                                </HelperText>
+                            )
+                        }
+
+
+                        <TextInput
+                            style={[styles.txtinput1, { borderColor: border18 }]}
+                            onFocus={() => setBorder18(appColor.appColorGreen)}
+                            onBlur={() => setBorder18('#bec5d1')}
+                            blurOnSubmit={true}
+                            placeholder='Enter Target Archieved'
+                            value={stateMonthlyDaroodCircleArchived}
+                            onChangeText={(text) => {
+                                setStateMonthlyDaroodCircleArchived(text)
+                                setShowMonthlyDaroodCircleArchived(true)
+                            }}
+                        />
+                        {
+                            showMonthlyDaroodCircleArchived || (
+                                <HelperText visible={!showMonthlyDaroodCircleArchived} type="error" >
+                                    please enter a target archived
+                                </HelperText>
+                            )
+                        }
+                    </View>
+
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>Monthly Meeting</Text>
+
+                        <TouchableRipple style={{
+                            flexDirection: 'row',
+                            //backgroundColor: 'red',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            borderWidth: 1,
+                            marginTop: '5%',
+                            height: 50,
+                            backgroundColor: '#fff',
+                            paddingHorizontal: '5%',
+                            borderRadius: responsiveWidth(4),
+                            borderColor: '#bec5d1'
+                        }} onPress={() => refRBSheetCustomBottomSheetMonthlyMeeting.current.open()}
+                        >
+                            <>
+                                <View style={{
+                                    height: 50,
+                                    justifyContent: 'center',
+                                    flex: 1,
+                                    //      backgroundColor: 'red'
+                                }}>
+                                    <Text style={{
+
+                                        fontSize: responsiveFontSize(2),
+                                        fontFamily: fontFamily.appTextRegular,
+                                    }}>
+                                        {stateMonthlyMeeting}</Text>
+
+                                </View>
+                                <AntDesign name='down'
+                                    size={24} style={{ marginRight: '3%' }} />
+
+                            </>
+                        </TouchableRipple>
+
+
+                        {
+                            showMonthlyMeeting || (
+                                <HelperText visible={!showMonthlyMeeting} type="error" >
+                                    please enter a monthly meeting
+                                </HelperText>
+                            )
+                        }
+                    </View>
+
+                    <View style={{ marginTop: '10%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextSemiBold,
+                            color: '#32B768'
+                        }}>Training Session</Text>
+
+                        <TouchableRipple style={{
+                            flexDirection: 'row',
+                            //backgroundColor: 'red',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            borderWidth: 1,
+                            marginTop: '5%',
+                            height: 50,
+                            backgroundColor: '#fff',
+                            paddingHorizontal: '5%',
+                            borderRadius: responsiveWidth(4),
+                            borderColor: '#bec5d1'
+                        }} onPress={() => refRBSheetCustomBottomSheetTrainingSession.current.open()}
+                        >
+                            <>
+                                <View style={{
+                                    height: 50,
+                                    justifyContent: 'center',
+                                    flex: 1,
+                                    //      backgroundColor: 'red'
+                                }}>
+                                    <Text style={{
+
+                                        fontSize: responsiveFontSize(2),
+                                        fontFamily: fontFamily.appTextRegular,
+                                    }}>
+                                        {stateTrainingSession}</Text>
+
+                                </View>
+                                <AntDesign name='down'
+                                    size={24} style={{ marginRight: '3%' }} />
+
+                            </>
+                        </TouchableRipple>
+
+
+                        {
+                            showTrainingSession || (
+                                <HelperText visible={!showTrainingSession} type="error" >
+                                    please enter a training session
+                                </HelperText>
+                            )
+                        }
+                    </View>
+
+
+
+                    <View style={{ marginTop: '10%' }}>
+                        <LoaderButtonRnPaper
+                            onPress={
+                                () => {
+                                    update()
+                                }
+                            }
+                            loading={isLoading}
+                            label="Update"
+                        />
+                    </View>
+
+
+
+
+                    <CustomBottomSheet
+                        closeBottomSheet={() => {
+                            refRBSheetCustomBottomSheetMonthlyMeeting.current.close()
+                        }}
+
+                        heading="Monthly Meeting"
+                        uppertouchableripple={() => {
+                            setStateMonthlyMeeting('Yes')
+                            setShowMonthlyMeeting(true)
+                            refRBSheetCustomBottomSheetMonthlyMeeting.current.close()
+                        }}
+
+                        lowertouchableripple={() => {
+                            setStateMonthlyMeeting('No')
+                            setShowMonthlyMeeting(true)
+                            refRBSheetCustomBottomSheetMonthlyMeeting.current.close()
+                        }}
+                        refs={refRBSheetCustomBottomSheetMonthlyMeeting}
+
                     />
-                </View>
 
 
 
+                    <CustomBottomSheet
+                        closeBottomSheet={() => {
+                            refRBSheetCustomBottomSheetTrainingSession.current.close()
+                        }}
 
-                <CustomBottomSheet
-                    closeBottomSheet={() => {
-                        refRBSheetCustomBottomSheetMonthlyMeeting.current.close()
-                    }}
+                        heading="Training Session"
+                        uppertouchableripple={() => {
+                            setStateTrainingSession('Yes')
+                            setShowTrainingSession(true)
+                            refRBSheetCustomBottomSheetTrainingSession.current.close()
+                        }}
 
-                    heading="Monthly Meeting"
-                    uppertouchableripple={() => {
-                        setStateMonthlyMeeting('Yes')
-                        setShowMonthlyMeeting(true)
-                        refRBSheetCustomBottomSheetMonthlyMeeting.current.close()
-                    }}
+                        lowertouchableripple={() => {
+                            setStateTrainingSession('No')
+                            setShowTrainingSession(true)
+                            refRBSheetCustomBottomSheetTrainingSession.current.close()
+                        }}
+                        refs={refRBSheetCustomBottomSheetTrainingSession}
 
-                    lowertouchableripple={() => {
-                        setStateMonthlyMeeting('No')
-                        setShowMonthlyMeeting(true)
-                        refRBSheetCustomBottomSheetMonthlyMeeting.current.close()
-                    }}
-                    refs={refRBSheetCustomBottomSheetMonthlyMeeting}
+                    />
 
-                />
+                </ScrollView>
 
 
-
-                <CustomBottomSheet
-                    closeBottomSheet={() => {
-                        refRBSheetCustomBottomSheetTrainingSession.current.close()
-                    }}
-
-                    heading="Training Session"
-                    uppertouchableripple={() => {
-                        setStateTrainingSession('Yes')
-                        setShowTrainingSession(true)
-                        refRBSheetCustomBottomSheetTrainingSession.current.close()
-                    }}
-
-                    lowertouchableripple={() => {
-                        setStateTrainingSession('No')
-                        setShowTrainingSession(true)
-                        refRBSheetCustomBottomSheetTrainingSession.current.close()
-                    }}
-                    refs={refRBSheetCustomBottomSheetTrainingSession}
-
-                />
-
-            </ScrollView>
+            }
         </SafeAreaView>
     );
 };

@@ -21,6 +21,8 @@ import LoaderImage from '../../components/LoaderImage';
 import ModelTwoButton from '../../components/modeltwobutton/ModelTwoButton';
 
 const CustomDrawer = props => {
+
+
   const [isLoading, setIsLoading] = useState(false)
   const [image, setImage] = useState(props.user == null || props.user.image == undefined ? null : `${baseUrl}/${props.user.image}`)
 
@@ -260,7 +262,7 @@ const CustomDrawer = props => {
             backgroundColor: '#fff',
           }}>
           <TouchableRipple
-            disabled={props.user == null ? true : false}
+            disabled={props.user == null || props.user?.userType != "Province" ? true : false}
             activeOpacity={0.6}
             borderless={true}
             rippleColor={appColor.appColorGreen}
@@ -277,7 +279,7 @@ const CustomDrawer = props => {
               </View>
               <Text style={[styles.navigatortxt,
               {
-                color: props.user == null ? '#dadada' : '#1f2937'
+                color: props.user == null || props.user?.userType != "Province" ? '#dadada' : '#1f2937'
               }]}>Add Monthly Report</Text>
             </View>
           </TouchableRipple>
@@ -292,7 +294,7 @@ const CustomDrawer = props => {
             backgroundColor: '#fff',
           }}>
           <TouchableRipple
-            disabled={props.user == null ? true : false}
+            disabled={props.user == null || props.user?.userType != "Province" ? true : false}
             activeOpacity={0.6}
             borderless={true}
             rippleColor={appColor.appColorGreen}
@@ -309,7 +311,7 @@ const CustomDrawer = props => {
               </View>
               <Text style={[styles.navigatortxt,
               {
-                color: props.user == null ? '#dadada' : '#1f2937'
+                color: props.user == null || props.user?.userType != "Province" ? '#dadada' : '#1f2937'
               }]}>Monthly Reports</Text>
             </View>
           </TouchableRipple>
