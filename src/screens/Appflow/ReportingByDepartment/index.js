@@ -63,6 +63,7 @@ const ReportingByDepartment = (props) => {
       ReportCategory: showEvents == true ? "Event" : "Meeting"
 
     }
+    console.log(b)
 
     await axios.get(`${baseUrl}/get-reports-of-subordinates`, {
       params: b

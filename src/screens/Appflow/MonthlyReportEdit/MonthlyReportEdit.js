@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
     FlatList, SafeAreaView, StyleSheet, Text,
     TextInput, View
@@ -19,34 +19,29 @@ import CustomBottomSheet from '../../../components/custombottomsheet/CustomBotto
 import { updateLocale } from 'moment';
 import STYLES from '../../../STYLES/STYLES';
 import { useEffect } from 'react';
-import { getAsyncUserData } from '../../../utils/axioshelper/AxiosHelper';
+import { axiosPost, axiosPut, getAsyncUserData } from '../../../utils/axioshelper/AxiosHelper';
+import { baseUrl } from '../../../route';
+import ModelOneButton from '../../../components/modelonebutton/ModelOneButton';
 const MonthlyReportEdit = (props) => {
-    const [stateuserData, setStateUserData] = useState();
+    const { report } = props.route.params;
+
+
+
+
+    console.log(report)
+
     const [stateActivityIndicatorBody, setStateActivityIndicatorBody] = useState(false)
 
-    useEffect(() => {
 
-        const getsinglevalue = async () => {
 
-            try {
-                setStateActivityIndicatorBody(true)
-                const responseAsync = await getAsyncUserData()
-                console.log('jhgfgh')
-                console.log(responseAsync.city)
-                setStateAreaNumber(responseAsync.city)
+    const [visibleAlertModal, setVisibleAlertModal] = useState(false);
 
-                // setStateAreaNumber('KJHGHJK')
-                setStateActivityIndicatorBody(false)
-            }
-            catch (err) {
-                setStateActivityIndicatorBody(false)
-                alert(err)
-            }
-        }
+    const showAlertModal = () => setVisibleAlertModal(true);
 
-        getsinglevalue()
+    const onDismissAlertModal = useCallback(() => { setVisibleAlertModal(false) }, [])
 
-    }, [])
+
+   
 
 
     const [border1, setBorder1] = useState('#bec5d1');
@@ -70,32 +65,32 @@ const MonthlyReportEdit = (props) => {
     const [border17, setBorder17] = useState('#bec5d1');
 
     const [border18, setBorder18] = useState('#bec5d1');
-    const [border19, setBorder19] = useState('#bec5d1');
+ 
 
-    const [stateAreaNumber, setStateAreaNumber] = useState('')
-    const [stateLifeTimeMembersTarget, setStateLifeTimeMembersTarget] = useState('')
-    const [stateRegularMembersTarget, setStateRegularMembersTarget] = useState('')
-    const [stateRestorationOfDefaultersTarget, setStateRestorationOfDefaultersTarget] = useState('')
-    const [stateMembershipAmountTarget, setStateMembershipAmountTarget] = useState('')
-    const [stateNewUcsTarget, setStateNewUcsTarget] = useState('')
+    const [stateAreaNumber, setStateAreaNumber] = useState(report.AreaNumber)
+    const [stateLifeTimeMembersTarget, setStateLifeTimeMembersTarget] = useState(report.LifeTimeMembersTarget)
+    const [stateRegularMembersTarget, setStateRegularMembersTarget] = useState(report.RegularMembersTarget)
+    const [stateRestorationOfDefaultersTarget, setStateRestorationOfDefaultersTarget] = useState(report.RestorationOfDefaultersTarget)
+    const [stateMembershipAmountTarget, setStateMembershipAmountTarget] = useState(report.MembershipAmountTarget)
+    const [stateNewUcsTarget, setStateNewUcsTarget] = useState(report.NewUcsTarget)
 
-    const [stateNewUnitTarget, setStateNewUnitTarget] = useState('')
-    const [stateMonthlyQuranCircleTarget, setStateMonthlyQuranCircleTarget] = useState('')
-    const [stateMonthlyDaroodCircleTarget, setStateMonthlyDaroodCircleTarget] = useState('')
-    const [stateMonthlyMeeting, setStateMonthlyMeeting] = useState('')
-    const [stateTrainingSession, setStateTrainingSession] = useState('')
+    const [stateNewUnitTarget, setStateNewUnitTarget] = useState(report.NewUnitTarget)
+    const [stateMonthlyQuranCircleTarget, setStateMonthlyQuranCircleTarget] = useState(report.MonthlyQuranCircleTarget)
+    const [stateMonthlyDaroodCircleTarget, setStateMonthlyDaroodCircleTarget] = useState(report.MonthlyDaroodCircleTarget)
+    const [stateMonthlyMeeting, setStateMonthlyMeeting] = useState(report.MonthlyMeeting)
+    const [stateTrainingSession, setStateTrainingSession] = useState(report.TrainingSession)
 
 
 
-    const [stateLifeTimeMembersArchived, setStateLifeTimeMembersArchived] = useState('')
-    const [stateRegularMembersArchived, setStateRegularMembersArchived] = useState('')
-    const [stateRestorationOfDefaultersArchived, setStateRestorationOfDefaultersArchived] = useState('')
-    const [stateMembershipAmountArchived, setStateMembershipAmountArchived] = useState('')
-    const [stateNewUcsArchived, setStateNewUcsArchived] = useState('')
+    const [stateLifeTimeMembersArchived, setStateLifeTimeMembersArchived] = useState(report.LifeTimeMembersAchieved)
+    const [stateRegularMembersArchived, setStateRegularMembersArchived] = useState(report.RegularMembersAchieved)
+    const [stateRestorationOfDefaultersArchived, setStateRestorationOfDefaultersArchived] = useState(report.RestorationOfDefaultersAchieved)
+    const [stateMembershipAmountArchived, setStateMembershipAmountArchived] = useState(report.MembershipAmountAchieved)
+    const [stateNewUcsArchived, setStateNewUcsArchived] = useState(report.NewUcsAchieved)
 
-    const [stateNewUnitArchived, setStateNewUnitArchived] = useState('')
-    const [stateMonthlyQuranCircleArchived, setStateMonthlyQuranCircleArchived] = useState('')
-    const [stateMonthlyDaroodCircleArchived, setStateMonthlyDaroodCircleArchived] = useState('')
+    const [stateNewUnitArchived, setStateNewUnitArchived] = useState(report.NewUnitAchieved)
+    const [stateMonthlyQuranCircleArchived, setStateMonthlyQuranCircleArchived] = useState(report.MonthlyQuranCircleAchieved)
+    const [stateMonthlyDaroodCircleArchived, setStateMonthlyDaroodCircleArchived] = useState(report.MonthlyDaroodCircleAchieved)
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -129,7 +124,7 @@ const MonthlyReportEdit = (props) => {
 
 
 
-    const update = () => {
+    const update = async () => {
 
         if (stateAreaNumber == '') {
             //   console.log(stateData.email + 'emailaddress')
@@ -245,23 +240,84 @@ const MonthlyReportEdit = (props) => {
         }
 
 
-        if (stateAreaNumber != '' && stateLifeTimeMembers != ''
-            && stateRegularMembers != '' &&
-            stateRestorationOfDefaulters != '' && stateMembershipAmount != ''
-            && stateNewUcs != ''
+        if (stateAreaNumber != '' && stateLifeTimeMembersTarget != ''
+            && stateRegularMembersTarget != '' &&
+            stateRestorationOfDefaultersTarget != '' && stateMembershipAmountTarget != ''
+            && stateNewUcsTarget != ''
             &&
-            stateNewUnit != '' && stateMonthlyQuranCircle != ''
-            && stateMonthlyDaroodCircle != ''
+            stateNewUnitTarget != '' && stateMonthlyQuranCircleTarget != ''
+            && stateMonthlyDaroodCircleTarget != ''
+
+            && stateLifeTimeMembersArchived != ''
+            && stateRegularMembersArchived != '' &&
+            stateRestorationOfDefaultersArchived != ''
+            && stateMembershipAmountArchived != ''
+            && stateNewUcsArchived != ''
+            &&
+            stateNewUnitArchived != '' && stateMonthlyQuranCircleArchived != ''
+            && stateMonthlyDaroodCircleArchived != ''
 
             && stateMonthlyMeeting != ''
             && stateTrainingSession != ''
 
 
         ) {
+            setIsLoading(true)
 
 
 
-            props.navigation.navigate("MonthlyReport")
+            const b = {
+                _id: report._id,
+                AreaNumber: stateAreaNumber,
+                LifeTimeMembersTarget: stateLifeTimeMembersTarget,
+                LifeTimeMembersAchieved: stateLifeTimeMembersArchived,
+                RegularMembersTarget: stateRegularMembersTarget,
+                RegularMembersAchieved: stateRegularMembersArchived,
+                RestorationOfDefaultersTarget: stateRestorationOfDefaultersTarget,
+                RestorationOfDefaultersAchieved: stateRestorationOfDefaultersArchived,
+                MembershipAmountTarget: stateMembershipAmountTarget,
+                MembershipAmountAchieved: stateMembershipAmountArchived,
+
+                NewUcsTarget: stateNewUcsTarget,
+                NewUcsAchieved: stateNewUcsArchived,
+                NewUnitTarget: stateNewUnitTarget,
+                NewUnitAchieved: stateNewUnitArchived,
+                MonthlyQuranCircleTarget: stateMonthlyQuranCircleTarget,
+                MonthlyQuranCircleAchieved: stateMonthlyQuranCircleArchived,
+                MonthlyDaroodCircleTarget: stateMonthlyDaroodCircleTarget,
+                MonthlyDaroodCircleAchieved: stateMonthlyDaroodCircleArchived,
+
+
+                MonthlyMeeting: stateMonthlyMeeting,
+                TrainingSession: stateTrainingSession,
+
+
+            }
+            console.log(b)
+            try {
+
+                const reponseApi = await axiosPut(baseUrl + '/monthlyReportUpdate',
+                    b
+                )
+                setIsLoading(false)
+                console.log(reponseApi.data)
+                console.log(reponseApi.data.length)
+
+                if (!reponseApi.data || reponseApi.data == {}) {
+                    setIsLoading(false)
+                }
+                else {
+
+                    showAlertModal()
+                    console.log(reponseApi.data)
+
+                }
+            }
+            catch (e) {
+                alert(e)
+            }
+
+
 
         }
 
@@ -280,7 +336,7 @@ const MonthlyReportEdit = (props) => {
             <View style={{
                 marginBottom: '5%'
             }}>
-                <HeaderGoBackCenterText text="Add Report"
+                <HeaderGoBackCenterText text="Edit Report"
                     onPress={() => {
                         props.navigation.goBack()
                     }} />
@@ -309,6 +365,7 @@ const MonthlyReportEdit = (props) => {
                             color: '#32B768'
                         }}>Area Number</Text>
                         <TextInput
+                            editable={false}
                             placeholder='Enter Area Number'
                             style={[styles.txtinput1, { borderColor: border1 }]}
                             onFocus={() => setBorder1(appColor.appColorGreen)}
@@ -628,10 +685,10 @@ const MonthlyReportEdit = (props) => {
                             onBlur={() => setBorder14('#bec5d1')}
                             blurOnSubmit={true}
                             placeholder='Enter Target Archieved'
-                            value={stateNewUcsArchived}
+                            value={stateNewUnitArchived}
                             onChangeText={(text) => {
-                                setStateNewUcsArchived(text)
-                                setShowNewUcsArchived(true)
+                                setStateNewUnitArchived(text)
+                                setShowNewUnitArchived(true)
                             }}
                         />
                         {
@@ -909,10 +966,24 @@ const MonthlyReportEdit = (props) => {
 
                     />
 
+
+
                 </ScrollView>
 
 
+
             }
+
+            <ModelOneButton
+                visible={visibleAlertModal}
+                onDismiss={onDismissAlertModal}
+                text1="Success"
+                text2="Report Sent Successfully"
+                onPress={() => {
+                    onDismissAlertModal()
+                    props.navigation.navigate("MonthlyReport")
+                }}
+                buttonText="Ok" />
         </SafeAreaView>
     );
 };
@@ -1051,9 +1122,6 @@ const styles = StyleSheet.create({
         marginTop: responsiveHeight(2),
     },
 });
-
-
-
 
 
 

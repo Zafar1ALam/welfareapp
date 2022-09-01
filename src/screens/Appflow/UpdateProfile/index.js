@@ -73,26 +73,26 @@ const EditProfileScreen = (props) => {
         }]).then(async (response) => {
             console.log("response.data")
             console.log(response.data)
-            // var a = response.data.split('"')[1]
-            // console.log('props.user_id' + props.user._id)
-            // console.log('respon.data' + response.data)
-            // console.log('profession' + profession)
-            // setIsLoading(false)
-            // await axios.put(`${baseUrl}/update-user`, {
-            //     _id: props.user._id,
-            //     image: a,
-            //     profession: profession,
-            // }).then(response => {
-            //     console.log('response.data')
-            //     console.log(response.data)
-            //     storeData(response.data)
-            //     props.setUserData(response.data)
-            //     setShowProfileUpdatedModal(true)
-            //     setIsLoading(false)
-            // }).catch(error => {
-            //     alert(error)
-            //     setIsLoading(false)
-            // })
+            var a = response.data.split('"')[1]
+            console.log('props.user_id' + props.user._id)
+            console.log('respon.data' + response.data)
+            console.log('profession' + profession)
+            setIsLoading(false)
+            await axios.put(`${baseUrl}/update-user`, {
+                _id: props.user._id,
+                image: a,
+                profession: profession,
+            }).then(response => {
+                console.log('response.data')
+                console.log(response.data)
+                storeData(response.data)
+                props.setUserData(response.data)
+                setShowProfileUpdatedModal(true)
+                setIsLoading(false)
+            }).catch(error => {
+                alert(error)
+                setIsLoading(false)
+            })
         }).catch((error) => {
             alert(error)
         })

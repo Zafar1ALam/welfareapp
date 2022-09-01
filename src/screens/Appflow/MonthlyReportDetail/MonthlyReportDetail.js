@@ -1,141 +1,48 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, SafeAreaView, Text, View } from 'react-native';
 import LeftArrow from 'react-native-vector-icons/MaterialIcons';
-import { TouchableRipple } from 'react-native-paper'
+import { TouchableRipple, ActivityIndicator } from 'react-native-paper'
 import HeaderGoBackCenterText from '../../../components/headergobackcentertext/HeaderGoBackCenterText';
 import { fontFamily } from '../../../constants/fonts';
 import { ScrollView } from 'react-native-gesture-handler';
 import LoaderButtonRnPaper from '../../../components/LoaderButton';
 import STYLES from '../../../STYLES/STYLES';
+import ReportDetailComponent from '../../../components/reportdetailcomponent/ReportDetailComponent';
+import { getAsyncUserData } from '../../../utils/axioshelper/AxiosHelper';
 const MonthlyReportDetail = (props) => {
-
+    const { report } = props.route.params;
+    console.log('fghj')
+    console.log(report)
     const [isLoading, setIsLoading] = useState(false);
-
-    const [secondlist, setSecondlist] = useState([
-        {
-            id: 1,
-            headingText: "Lifetime Members",
-            target: "02",
-            achived: "00"
-        },
-        {
-            id: 2,
-            headingText: "Regular Members",
-            target: "05",
-            achived: "00"
-        },
-        {
-            id: 3,
-            headingText: "Restoration of Defaulters",
-            target: "05",
-            achived: "00"
-        },
-        {
-            id: 4,
-            headingText: "Membership Amount",
-            target: "15,000 Rs.",
-            achived: "00"
-        },
-        {
-            id: 5, headingText: "New Ucs",
-            target: "02",
-            achived: "01"
-
-        },
-        {
-            id: 6,
-            headingText: "New Unit",
-            target: "02",
-            achived: "00"
-        },
-        {
-            id: 7,
-            headingText: "Monthly Quran Circle",
-            target: "01",
-            achived: "00"
-        },
-        {
-            id: 8,
-            headingText: "Monthly Darood Circle",
-            target: "02",
-            achived: "00"
-        },
-
-    ]);
+    const [stateuserId, setStateUserId] = useState();
 
 
-    const Secondrenderitem = ({ item, index }) => {
-        return (
-            <View style={{
-                backgroundColor: "#F6F6F6",
+    const [stateActivityIndicatorBody, setStateActivityIndicatorBody] = useState(false)
+    useEffect(() => {
 
-                justifyContent: 'space-evenly',
+        const getsinglevalue = async () => {
 
-                height: 70,
+            try {
+                setStateActivityIndicatorBody(true)
+                const responseAsync = await getAsyncUserData()
 
-                borderBottomWidth: 1,
-                borderBottomColor: 'rgba(112,112,112,0.27)',
 
-                paddingHorizontal: '4%',
+                setStateUserId(responseAsync._id)
 
-                marginTop: '2%'
+                // setStateAreaNumber('KJHGHJK')
+                setStateActivityIndicatorBody(false)
+            }
+            catch (err) {
+                setStateActivityIndicatorBody(false)
+                alert(err)
+            }
+        }
 
-            }}>
-                <View>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextSemiBold,
-                        color: '#32B768'
-                    }}>{item.headingText}</Text>
-                </View>
-                <View style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between'
-                }}>
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: "center"
-                    }}>
-                        <View>
-                            <Text style={{
-                                fontSize: 10,
-                                fontFamily: fontFamily.appTextBold,
-                                color: '#000000'
-                            }}>Target </Text>
-                        </View>
-                        <View>
-                            <Text style={{
-                                fontSize: 10,
-                                fontFamily: fontFamily.appTextMedium,
-                                color: 'rgba(0,0,0,0.70)'
-                            }}>: {item.target}</Text>
-                        </View>
-                    </View>
+        getsinglevalue()
 
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: "center"
-                    }}>
-                        <View>
-                            <Text style={{
-                                fontSize: 10,
-                                fontFamily: fontFamily.appTextBold,
-                                color: '#000000'
-                            }}>Achived </Text>
-                        </View>
-                        <View>
-                            <Text style={{
-                                fontSize: 10,
-                                fontFamily: fontFamily.appTextMedium,
-                                color: 'rgba(0,0,0,0.70)'
-                            }}>: {item.achived}</Text>
-                        </View>
-                    </View>
+    }, [])
 
-                </View>
-            </View>
-        );
-    };
+
     return (
 
         <SafeAreaView style={
@@ -152,96 +59,221 @@ const MonthlyReportDetail = (props) => {
                         props.navigation.goBack()
                     }} />
             </View>
-            <ScrollView showsVerticalScrollIndicator={false}
-                style={{}}>
-                <View style={{ marginTop: '8%', marginBottom: '3%' }}>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: fontFamily.appTextBold,
-                        color: '#000000'
-                    }}>Area Number Here</Text>
+
+
+
+            {stateActivityIndicatorBody
+                ?
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <ActivityIndicator
+                        animating={stateActivityIndicatorBody} color={'#32B768'} />
                 </View>
+                :
+
+                <ScrollView showsVerticalScrollIndicator={false}
+                    style={{}}>
+                    <View style={{ marginTop: '8%', marginBottom: '3%' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: fontFamily.appTextBold,
+                            color: '#000000'
+                        }}>{report.AreaNumber}</Text>
+                    </View>
 
 
-                <FlatList
+                    {/* <FlatList
                     showsVerticalScrollIndicator={false}
                     data={secondlist}
                     renderItem={Secondrenderitem}
 
-                />
+                /> */}
+                    <View style={{
 
-                <View style={{
-                    height: 70,
-                    justifyContent: 'space-evenly',
-                    borderBottomWidth: 1,
-                    borderBottomColor: 'rgba(112,112,112,0.27)',
 
-                    paddingHorizontal: '4%',
+                    }}>
+                        <ReportDetailComponent
+                            heading="Lifetime Members"
+                            target={report.LifeTimeMembersTarget}
+                            archieved={report.LifeTimeMembersAchieved}
+                        />
 
-                    marginTop: '2%'
-                }}>
-                    <View>
-                        <Text style={{
-                            fontSize: 14,
-                            fontFamily: fontFamily.appTextSemiBold,
-                            color: '#32B768'
-                        }}>Monthly Meeting</Text>
+
                     </View>
 
-                    <View>
-                        <Text style={{
-                            fontSize: 10,
-                            fontFamily: fontFamily.appTextBold,
-                            color: '#000000'
-                        }}>Yes</Text>
+                    <View style={{
+
+
+                    }}>
+                        <ReportDetailComponent
+                            heading="Regular Members"
+                            target={report.RegularMembersTarget}
+                            archieved={report.RegularMembersAchieved}
+                        />
+
+
+                    </View>
+
+                    <View style={{
+
+
+                    }}>
+                        <ReportDetailComponent
+                            heading="Restoration of Defaulters"
+                            target={report.RestorationOfDefaultersTarget}
+                            archieved={report.RestorationOfDefaultersAchieved}
+                        />
+
+
+                    </View>
+
+                    <View style={{
+
+
+                    }}>
+                        <ReportDetailComponent
+                            heading="Membership Amount"
+                            target={report.MembershipAmountTarget}
+                            archieved={report.MembershipAmountAchieved}
+                        />
+
+
+                    </View>
+
+                    <View style={{
+
+
+                    }}>
+                        <ReportDetailComponent
+                            heading="New Ucs"
+                            target={report.NewUcsTarget}
+                            archieved={report.NewUcsAchieved}
+                        />
+
+
+                    </View>
+
+                    <View style={{
+
+
+                    }}>
+                        <ReportDetailComponent
+                            heading="New Unit"
+                            target={report.NewUnitTarget}
+                            archieved={report.NewUnitAchieved}
+                        />
+
+
+                    </View>
+
+                    <View style={{
+
+
+                    }}>
+                        <ReportDetailComponent
+                            heading="Monthly Quran Circle"
+                            target={report.MonthlyQuranCircleTarget}
+                            archieved={report.MonthlyQuranCircleAchieved}
+                        />
+
+
+                    </View>
+
+                    <View style={{
+
+
+                    }}>
+                        <ReportDetailComponent
+                            heading="Monthly Darood Circle"
+                            target={report.MonthlyDaroodCircleTarget}
+                            archieved={report.MonthlyDaroodCircleAchieved}
+                        />
+
+
                     </View>
 
 
+                    <View style={{
+                        height: 70,
+                        justifyContent: 'space-evenly',
+                        borderBottomWidth: 1,
+                        borderBottomColor: 'rgba(112,112,112,0.27)',
+                        backgroundColor: "#F6F6F6",
+                        paddingHorizontal: '4%',
+
+                        marginTop: '2%'
+                    }}>
+                        <View>
+                            <Text style={{
+                                fontSize: 14,
+                                fontFamily: fontFamily.appTextSemiBold,
+                                color: '#32B768'
+                            }}>Monthly Meeting</Text>
+                        </View>
+
+                        <View>
+                            <Text style={{
+                                fontSize: 10,
+                                fontFamily: fontFamily.appTextBold,
+                                color: '#000000'
+                            }}>{report.MonthlyMeeting}</Text>
+                        </View>
 
 
-                </View>
 
-                <View style={{
-                    height: 70,
-                    justifyContent: 'space-evenly',
-                    borderBottomWidth: 1,
-                    borderBottomColor: 'rgba(112,112,112,0.27)',
 
-                    paddingHorizontal: '4%',
-
-                    marginTop: '2%'
-                }}>
-                    <View>
-                        <Text style={{
-                            fontSize: 14,
-                            fontFamily: fontFamily.appTextSemiBold,
-                            color: '#32B768'
-                        }}>Training Session</Text>
                     </View>
 
-                    <View>
-                        <Text style={{
-                            fontSize: 10,
-                            fontFamily: fontFamily.appTextBold,
-                            color: '#000000'
-                        }}>No</Text>
+                    <View style={{
+                        height: 70,
+                        justifyContent: 'space-evenly',
+                        borderBottomWidth: 1,
+                        borderBottomColor: 'rgba(112,112,112,0.27)',
+                        backgroundColor: "#F6F6F6",
+                        paddingHorizontal: '4%',
+
+                        marginTop: '2%'
+                    }}>
+                        <View>
+                            <Text style={{
+                                fontSize: 14,
+                                fontFamily: fontFamily.appTextSemiBold,
+                                color: '#32B768'
+                            }}>Training Session</Text>
+                        </View>
+
+                        <View>
+                            <Text style={{
+                                fontSize: 10,
+                                fontFamily: fontFamily.appTextBold,
+                                color: '#000000'
+                            }}>{report.TrainingSession}</Text>
+                        </View>
+
+
+
+
                     </View>
+                    {stateuserId == report.userId && (
 
 
+                        <View style={{ marginTop: '10%' }}>
+                            <LoaderButtonRnPaper
+                                onPress={() => {
+                                    props.navigation.navigate("MonthlyReportEdit", {
+                                        report: report
+                                    })
+                                }}
+                                loading={isLoading}
+                                label="Edit"
+                            />
+                        </View>
+                    )
+                    }
 
 
-                </View>
+                </ScrollView>
 
-                <View style={{ marginTop: '10%' }}>
-                    <LoaderButtonRnPaper
-                        onPress={() => {
-                            props.navigation.navigate("MonthlyReportEdit")
-                        }}
-                        loading={isLoading}
-                        label="Edit"
-                    />
-                </View>
-            </ScrollView>
+            }
         </SafeAreaView>
     );
 };

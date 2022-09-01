@@ -21,14 +21,16 @@ import { appImages } from '../../../assets/utilities';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import RightArrow from 'react-native-vector-icons/MaterialIcons';
 import { fontFamily } from '../../../constants/fonts';
-import { TouchableRipple } from 'react-native-paper';
+import { ActivityIndicator, TouchableRipple } from 'react-native-paper';
 import Plus from 'react-native-vector-icons/MaterialCommunityIcons';
 import LeftArrow from 'react-native-vector-icons/MaterialIcons';
 import { baseUrl } from '../../../route';
 import axios from 'axios';
 import RNFetchBlob from 'rn-fetch-blob';
-
+import { useIsFocused } from '@react-navigation/native';
 const MonthlyReport = (props) => {
+    const isFocused = useIsFocused();
+    const [stateActivityIndicatorBody, setStateActivityIndicatorBody] = useState(false)
     const [secondlist, setSecondlist] = useState([
         {
             id: 1,
@@ -68,25 +70,27 @@ const MonthlyReport = (props) => {
 
 
 
-    // const getLibraryApi = async () => {
-    //     await axios.post(baseUrl + "/get-library-items")
-    //         .then(response => {
+    const getMonthlyReport = async () => {
+        setStateActivityIndicatorBody(true)
+        await axios.get(baseUrl + "/monthlyReportGetAll")
+            .then(response => {
 
-    //             console.log(response.data)
-    //             setSecondlist(response.data)
-    //         })
-    //         .catch(error => {
+                console.log(response.data)
+                setSecondlist(response.data)
+                setStateActivityIndicatorBody(false)
+            })
+            .catch(error => {
+                setStateActivityIndicatorBody(false)
+                alert(error)
+                console.log('w');
+            });
+    }
 
-    //             alert(error)
-    //             console.log('w');
-    //         });
-    // }
 
 
-
-    // useEffect(() => {
-    //     getLibraryApi()
-    // }, [])
+    useEffect(() => {
+        getMonthlyReport()
+    }, [isFocused])
 
 
 
@@ -111,7 +115,7 @@ const MonthlyReport = (props) => {
                         fontSize: 14,
                         fontFamily: fontFamily.appTextSemiBold,
                         color: '#1F2937'
-                    }}>Area Number</Text>
+                    }}>{item.PPArea}</Text>
                 </View>
 
                 <TouchableRipple style={{
@@ -121,7 +125,10 @@ const MonthlyReport = (props) => {
                     paddingVertical: '1%'
                 }}
                     onPress={() => {
-                        props.navigation.navigate("MonthlyReportDetail")
+                        props.navigation.navigate("MonthlyReportDetail",
+                            {
+                                report: item
+                            })
                     }}>
                     <Text style={{
                         fontSize: 10,
@@ -146,15 +153,24 @@ const MonthlyReport = (props) => {
                     <Text style={styles.eventtxt}>Monthly Report</Text>
                 </View>
             </View>
-            <FlatList
-                showsVerticalScrollIndicator={false}
-                data={secondlist}
-                renderItem={Secondrenderitem}
-                contentContainerStyle={{
-                    marginTop: responsiveHeight(2),
-                    paddingBottom: responsiveHeight(3),
-                }}
-            />
+            {stateActivityIndicatorBody
+                ?
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <ActivityIndicator
+                        animating={stateActivityIndicatorBody} color={'#32B768'} />
+                </View>
+                :
+
+                <FlatList
+                    showsVerticalScrollIndicator={false}
+                    data={secondlist}
+                    renderItem={Secondrenderitem}
+                    contentContainerStyle={{
+                        marginTop: responsiveHeight(2),
+                        paddingBottom: responsiveHeight(3),
+                    }}
+                />
+            }
         </View>
     );
 };

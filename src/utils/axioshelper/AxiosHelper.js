@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 
 export const getAsyncUserData = async () => {
@@ -22,4 +23,20 @@ export const getAsyncUserData = async () => {
 
 
 }
+
+
+export const axiosPost = async (url, body) => {
+    console.log(url, body)
+
+    return await axios.post(url, body)
+
+}
+
+export const axiosPut = async (url, body) => {
+    console.log(url, body)
+
+    return await axios.put(url, body)
+
+}
+
 

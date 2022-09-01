@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ScrollView, StatusBar, ImageBackground, Image, TouchableOpacity, TouchableNativeFeedback, FlatList, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { responsiveHeight, responsiveWidth, responsiveFontSize } from 'react-native-responsive-dimensions';
 import { appColor } from '../../../constants/colors';
 import { appImages } from '../../../assets/utilities';
@@ -19,9 +19,15 @@ import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from '@react-navigation/native'
 import LoaderButtonRnPaper from '../../../components/LoaderButton';
+import ModelOneButton from '../../../components/modelonebutton/ModelOneButton';
 
 const AddReporting = props => {
 
+  const [visibleAlertModal, setVisibleAlertModal] = useState(false);
+
+  const showAlertModal = () => setVisibleAlertModal(true);
+
+  const onDismissAlertModal = useCallback(() => { setVisibleAlertModal(false) }, [])
 
 
   const isFocused = useIsFocused()
@@ -182,8 +188,13 @@ const AddReporting = props => {
         setIsLoading(false)
         if (response.data) {
           console.log(response.data)
+
           const imagesForDb = JSON.parse(response.data)
-          await axios.post(`${baseUrl}/create-report`, {
+
+
+
+
+          let b = {
             reportBy: props.user._id,
             title: title,
 
@@ -193,11 +204,21 @@ const AddReporting = props => {
             location: location,
             date: date,
             time: time,
-            images: imagesForDb.images,
-          }).then(response => {
+            images: imagesForDb.images
+          }
+
+          console.log(b)
+
+
+          await axios.post(`${baseUrl}/create-report`,
+            b
+          ).then(response => {
             setIsLoading(false)
+            showAlertModal()
+
+            console.log('hugfghjhgfdfghjbhvxdhhgfdujhgfujhbvc')
             console.log(response.data)
-            props.navigation.goBack()
+
           }).catch(error => {
             setIsLoading(false)
             alert(error)
@@ -454,6 +475,17 @@ const AddReporting = props => {
           label="Submit"
         />
       </ScrollView>
+
+      <ModelOneButton
+        visible={visibleAlertModal}
+        onDismiss={onDismissAlertModal}
+        text1="Success"
+        text2="Report Sent Successfully"
+        onPress={() => {
+          onDismissAlertModal()
+          props.navigation.goBack()
+        }}
+        buttonText="Ok" />
     </KeyboardAvoidingView>
   );
 };
