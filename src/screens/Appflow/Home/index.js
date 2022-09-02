@@ -34,12 +34,6 @@ const Home = props => {
 
 
 
-  // const [visibleLogoutModal, setVisibleLogoutModal] = useState(false);
-
-  // const showLogoutModal = () => setVisibleLogoutModal(true);
-
-  // const onDismissLogoutModal = useCallback(() => { setVisibleLogoutModal(false) }, [])
-
   const [eventsByDate, setEventsByDate] = useState([
     // {
     //   "images": [
@@ -403,14 +397,19 @@ const Home = props => {
           <View >
             <Text style={STYLES.fontSize14_1F2937_appTextMedium}>Title Here</Text>
           </View>
-          <View style={{ flexDirection: 'row' }}>
-            <View>
-              <Text style={STYLES.fontSize8_32B768_appTextBold}>Detail   </Text>
-            </View>
-            <View>
-              <Text style={STYLES.fontSize8_32B768_appTextBold}>{`>`}</Text>
-            </View>
-          </View>
+          <TouchableRipple style={{ flexDirection: 'row' }}
+            onPress={() =>
+              props.navigation.navigate('EventDetail', { eventDetail: eventsByDate[0], moreEvents: eventsByDate })}
+          >
+            <>
+              <View>
+                <Text style={STYLES.fontSize8_32B768_appTextBold}>Detail   </Text>
+              </View>
+              <View>
+                <Text style={STYLES.fontSize8_32B768_appTextBold}>{`>`}</Text>
+              </View>
+            </>
+          </TouchableRipple>
         </View>
 
         <View style={{ marginHorizontal: '4%', marginTop: '1%' }}>
@@ -710,21 +709,7 @@ const Home = props => {
       />
 
 
-      {/* <ModelTwoButton
-        visible={visibleLogoutModal}
-        onDismiss={onDismissLogoutModal}
-        text1="Confirmation"
-        text2="Do you really want to logout?"
-        methodOnLeftSide={() => {
-          onDismissLogoutModal()
 
-        }}
-        methodOnRightSide={() => {
-          onDismissLogoutModal()
-
-        }}
-
-      /> */}
     </View>
   );
 

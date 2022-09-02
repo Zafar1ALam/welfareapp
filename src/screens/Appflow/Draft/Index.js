@@ -21,60 +21,104 @@ import { appImages } from '../../../assets/utilities';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import RightArrow from 'react-native-vector-icons/MaterialIcons';
 import { fontFamily } from '../../../constants/fonts';
-import { TouchableRipple } from 'react-native-paper';
+import { ActivityIndicator, TouchableRipple } from 'react-native-paper';
 import Plus from 'react-native-vector-icons/MaterialCommunityIcons';
 import LeftArrow from 'react-native-vector-icons/MaterialIcons';
 import STYLES from '../../../STYLES/STYLES';
 import HeaderGoBackCenterText from '../../../components/headergobackcentertext/HeaderGoBackCenterText';
-
+import { useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAsyncUserData } from '../../../utils/axioshelper/AxiosHelper';
 const Draft = (props) => {
+    const isFocused = useIsFocused();
+    const [stateActivityIndicatorBody, setStateActivityIndicatorBody] = useState(false)
+    const [stateUserData, setStateUserData] = useState();
+    const [stateReportInDraft, setStateReportInDraft] = useState(true)
+
+    useEffect(() => {
+        const apiCall = async () => {
+            setStateActivityIndicatorBody(true)
+
+
+
+
+            const value = await AsyncStorage.getItem("draftReport1")
+            if (value != null) {
+
+                const responseAsync = await getAsyncUserData()
+
+                console.log(responseAsync)
+
+                setStateUserData(responseAsync)
+                console.log(value)
+                setSecondlist(JSON.parse(value))
+                setStateReportInDraft(true)
+                setStateActivityIndicatorBody(false)
+
+
+            }
+
+            else {
+                setStateReportInDraft(false)
+                setStateActivityIndicatorBody(false)
+
+            }
+        }
+        apiCall()
+    }, [isFocused])
+
+
+
     const [secondlist, setSecondlist] = useState([
-        {
-            id: 1,
-            date: "02-22-2022"
-        },
-        {
-            id: 2,
-            date: "02-22-2022"
-        },
-        {
-            id: 3,
-            date: "02-22-2022"
-        },
-        {
-            id: 4,
-            date: "02-22-2022"
-        },
-        {
-            id: 5,
-            date: "02-22-2022"
-        },
-        {
-            id: 6,
-            date: "02-22-2022"
-        },
-        {
-            id: 7,
-            date: "02-22-2022"
-        },
-        {
-            id: 8,
-            date: "02-22-2022"
-        },
-        {
-            id: 9,
-            date: "02-22-2022"
-        },
-        {
-            id: 10,
-            date: "02-22-2022"
-        },
-        {
-            id: 11,
-            date: "02-22-2022"
-        },
+        // {
+        //     id: 1,
+        //     date: "02-22-2022"
+        // },
+        // {
+        //     id: 2,
+        //     date: "02-22-2022"
+        // },
+        // {
+        //     id: 3,
+        //     date: "02-22-2022"
+        // },
+        // {
+        //     id: 4,
+        //     date: "02-22-2022"
+        // },
+        // {
+        //     id: 5,
+        //     date: "02-22-2022"
+        // },
+        // {
+        //     id: 6,
+        //     date: "02-22-2022"
+        // },
+        // {
+        //     id: 7,
+        //     date: "02-22-2022"
+        // },
+        // {
+        //     id: 8,
+        //     date: "02-22-2022"
+        // },
+        // {
+        //     id: 9,
+        //     date: "02-22-2022"
+        // },
+        // {
+        //     id: 10,
+        //     date: "02-22-2022"
+        // },
+        // {
+        //     id: 11,
+        //     date: "02-22-2022"
+        // },
     ]);
     const Secondrenderitem = ({ item, index }) => {
+        console.log(item.images[0].path)
+
+        console.log(item.title)
         return (
             <View style={{
                 height: 110, backgroundColor: '#FFFFFF',
@@ -95,11 +139,13 @@ const Draft = (props) => {
                     //backgroundColor: 'green',
                     borderRadius: 8
                 }}>
-                    <Image source={appImages.caroimage}
-                        style={{
-                            height: '100%',
+                    <Image source={{ uri: item.images[0].path }}
 
-                            width: '100%',
+                        // source={appImages.caroimage}
+                        style={{
+                            height: "100%",
+
+                            width: "100%",
                             borderRadius: 8
                         }} />
 
@@ -110,13 +156,13 @@ const Draft = (props) => {
                     marginHorizontal: '5%'
                 }}>
                     <View>
-                        <Text style={STYLES.fontSize16_1F2937_appTextSemiBold}>Title Here</Text>
+                        <Text style={STYLES.fontSize16_1F2937_appTextSemiBold}>{item.title}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image source={appImages.calender} style={styles.calender} />
                         <Text style={[styles.datestyle,
-                        { marginLeft: '4%' }]}>02-22-2022</Text>
+                        { marginLeft: '4%' }]}>{new Date(item.date).toISOString().split('T')[0]}</Text>
                         {/* {new Date(item.date).toISOString().split('T')[0]} */}
                     </View>
                 </View>
@@ -132,7 +178,11 @@ const Draft = (props) => {
                             backgroundColor: appColor.appColorGreen,
                             borderRadius: 8
                         }}
-                        onPress={() => props.navigation.navigate('DraftReportDetail')
+                        onPress={() => props.navigation.navigate('DraftReportDetail',
+                            {
+                                report: item,
+                                userData: stateUserData
+                            })
                         }
                         borderless={true}
                         rippleColor={'darkgreen'}>
@@ -163,15 +213,32 @@ const Draft = (props) => {
                 />
             </View>
 
-            <FlatList
-                showsVerticalScrollIndicator={false}
-                data={secondlist}
-                renderItem={Secondrenderitem}
-                contentContainerStyle={{
-                    marginTop: responsiveHeight(2),
-                    paddingBottom: responsiveHeight(3),
-                }}
-            />
+            {stateActivityIndicatorBody
+                ?
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <ActivityIndicator
+                        animating={stateActivityIndicatorBody} color={'#32B768'} />
+                </View>
+                :
+
+                stateReportInDraft ?
+
+                    <FlatList
+                        showsVerticalScrollIndicator={false}
+                        data={secondlist}
+                        renderItem={Secondrenderitem}
+                        contentContainerStyle={{
+                            marginTop: responsiveHeight(2),
+                            paddingBottom: responsiveHeight(3),
+                        }}
+                    />
+                    :
+
+                    <Text>No Report in Draft</Text>
+
+
+
+            }
         </View>
     );
 };

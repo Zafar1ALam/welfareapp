@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, StatusBar, ImageBackground, Image, TouchableOpacity, TouchableNativeFeedback, FlatList, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, StatusBar, ImageBackground, Image, TouchableOpacity, TouchableNativeFeedback, FlatList, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { responsiveHeight, responsiveWidth, responsiveFontSize } from 'react-native-responsive-dimensions';
 import { appColor } from '../../../constants/colors';
@@ -20,6 +20,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from '@react-navigation/native'
 import LoaderButtonRnPaper from '../../../components/LoaderButton';
 import ModelOneButton from '../../../components/modelonebutton/ModelOneButton';
+import NetInfo from "@react-native-community/netinfo";
+
 
 const AddReporting = props => {
 
@@ -28,6 +30,13 @@ const AddReporting = props => {
   const showAlertModal = () => setVisibleAlertModal(true);
 
   const onDismissAlertModal = useCallback(() => { setVisibleAlertModal(false) }, [])
+
+
+  const [visibleSaveDraftModal, setVisibleSaveDraftModal] = useState(false);
+
+  const showSaveDraftModal = () => setVisibleSaveDraftModal(true);
+
+  const onDismissSaveDraftModal = useCallback(() => { setVisibleSaveDraftModal(false) }, [])
 
 
   const isFocused = useIsFocused()
@@ -102,22 +111,22 @@ const AddReporting = props => {
       // console.log(e)
     }
   }
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('report_draft')
-      if (value !== null) {
-        const data = JSON.parse(value)
-        setImages(data.images)
-        setTitle(data.title)
-        setDescription(data.description)
-        setLocation(data.location)
-        setDate(data.date)
-        setTime(data.time)
-      }
-    } catch (e) {
-      // console.log(e)
-    }
-  }
+  // const getData = async () => {
+  //   try {
+  //     const value = await AsyncStorage.getItem('report_draft')
+  //     if (value !== null) {
+  //       const data = JSON.parse(value)
+  //       setImages(data.images)
+  //       setTitle(data.title)
+  //       setDescription(data.description)
+  //       setLocation(data.location)
+  //       setDate(data.date)
+  //       setTime(data.time)
+  //     }
+  //   } catch (e) {
+  //     // console.log(e)
+  //   }
+  // }
   const removeData = async () => {
     try {
       console.log('remove called')
@@ -175,64 +184,132 @@ const AddReporting = props => {
       setShowImageUploadHelperText(false)
       setShowFourImageOnlyHelperText(true)
     } else {
-      setIsLoading(true)
-      setSubmitPressed(true)
+      // setIsLoading(true)
+      //   setSubmitPressed(true)
       removeData()
-      await RNFetchBlob.fetch('POST',
-        `${baseUrl}/upload-multiple-images`, {
-        Authorization: "Bearer access-token",
-        otherHeader: "foo",
-        'Content-Type': 'multipart/form-data',
-      }, images).then(async (response) => {
-        console.log(response.data)
-        setIsLoading(false)
-        if (response.data) {
-          console.log(response.data)
-
-          const imagesForDb = JSON.parse(response.data)
 
 
 
 
-          let b = {
-            reportBy: props.user._id,
-            title: title,
+      NetInfo.addEventListener(async state => {
 
-
-            eventCategory: 'Public',
-            description: description,
-            location: location,
-            date: date,
-            time: time,
-            images: imagesForDb.images
-          }
-
-          console.log(b)
-
-
-          await axios.post(`${baseUrl}/create-report`,
-            b
-          ).then(response => {
-            setIsLoading(false)
-            showAlertModal()
-
-            console.log('hugfghjhgfdfghjbhvxdhhgfdujhgfujhbvc')
+        console.log("Is connected?", state.isConnected);
+        if (state.isConnected) {
+          await RNFetchBlob.fetch('POST',
+            `${baseUrl}/upload-multiple-images`, {
+            Authorization: "Bearer access-token",
+            otherHeader: "foo",
+            'Content-Type': 'multipart/form-data',
+          }, images).then(async (response) => {
             console.log(response.data)
-
-          }).catch(error => {
             setIsLoading(false)
-            alert(error)
+            if (response.data) {
+              console.log(response.data)
+
+              const imagesForDb = JSON.parse(response.data)
+
+
+
+
+              let b = {
+                reportBy: props.user._id,
+                title: title,
+
+
+                eventCategory: 'Public',
+                description: description,
+                location: location,
+                date: date,
+                time: time,
+                images: imagesForDb.images
+              }
+
+              console.log(b)
+
+
+              await axios.post(`${baseUrl}/create-report`,
+                b
+              ).then(response => {
+                setIsLoading(false)
+                showAlertModal()
+
+                console.log('hugfghjhgfdfghjbhvxdhhgfdujhgfujhbvc')
+                console.log(response.data)
+
+              }).catch(error => {
+                setIsLoading(false)
+                alert(error)
+              })
+            }
+          }).catch((error) => {
+            setIsLoading(false)
+            console.log(error)
           })
         }
-      }).catch((error) => {
-        setIsLoading(false)
-        console.log(error)
-      })
+        else {
+          // await AsyncStorage.setItem("draftReport1",
+          // JSON.stringify("draftReport1"))
+
+
+          const value = JSON.parse(await AsyncStorage.getItem("draftReport1") || '[]')
+          console.log(value.length)
+          if (value.length == 0) {
+            const item = {
+              images: images,
+              reportBy: props.user._id,
+              title: title,
+              eventCategory: 'Public',
+              description: description,
+              location: location,
+              date: date,
+              time: time,
+              randomId: 1
+            }
+            console.log('value')
+            console.log(value)
+            console.log(item)
+            await AsyncStorage.setItem("draftReport1", JSON.stringify([item]))
+
+
+              ;
+
+
+          }
+          else {
+            console.log(value)
+            var lastElement = value.slice(-1)[0];
+            console.log('lastElement')
+            console.log(lastElement.randomId)
+            const item = {
+              images: images,
+              reportBy: props.user._id,
+              title: title,
+              eventCategory: 'Public',
+              description: description,
+              location: location,
+              date: date,
+              time: time,
+              randomId: lastElement.randomId + 1
+            }
+
+            AsyncStorage.setItem("draftReport1", JSON.stringify([item, ...value]))
+
+          }
+          showSaveDraftModal()
+
+
+        }
+      }
+
+      )
     }
   }
+
+
+
   useEffect(() => {
     if (isFocused) {
-      getData()
+      //getData()
       console.log('focused')
     } else {
       console.log('not focused')
@@ -269,7 +346,7 @@ const AddReporting = props => {
                 onFocus={() => setBorder1(appColor.appColorGreen)}
                 onBlur={() => setBorder1('#bec5d1')}
                 blurOnSubmit={true}
-                value={title}
+                //   value={title}
                 onChangeText={setTitle}
               />
               {
@@ -288,7 +365,7 @@ const AddReporting = props => {
                 onBlur={() => setBorder2('#bec5d1')}
                 blurOnSubmit={true}
                 multiline={true}
-                value={description}
+                // value={description}
                 onChangeText={setDescription}
               />
               {
@@ -306,7 +383,7 @@ const AddReporting = props => {
                 onFocus={() => setBorder3(appColor.appColorGreen)}
                 onBlur={() => setBorder3('#bec5d1')}
                 blurOnSubmit={true}
-                value={location}
+                //  value={location}
                 onChangeText={setLocation}
               />
               {
@@ -483,6 +560,17 @@ const AddReporting = props => {
         text2="Report Sent Successfully"
         onPress={() => {
           onDismissAlertModal()
+          props.navigation.goBack()
+        }}
+        buttonText="Ok" />
+
+      <ModelOneButton
+        visible={visibleSaveDraftModal}
+        onDismiss={onDismissSaveDraftModal}
+        text1="Your report is saved in drafts"
+        text2="You can send later when you got internet connection"
+        onPress={() => {
+          onDismissSaveDraftModal()
           props.navigation.goBack()
         }}
         buttonText="Ok" />

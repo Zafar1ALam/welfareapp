@@ -25,7 +25,7 @@ const Login = props => {
     try {
       await AsyncStorage.setItem('user_session', JSON.stringify(value))
     } catch (error) {
-      console.log(error)
+      alert(error)
     }
   }
   const onLoginButtonPress = async () => {

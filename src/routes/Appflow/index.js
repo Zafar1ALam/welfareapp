@@ -18,6 +18,7 @@ import MonthlyReportEdit from '../../screens/Appflow/MonthlyReportEdit/MonthlyRe
 import DraftReportDetail from '../../screens/Appflow/draftreportdetail/DraftReportDetail';
 import ReportDetail from '../../screens/Appflow/reportdetail/ReportDetail';
 import AddMonthlyReport from '../../screens/Appflow/AddMonthlyReport/AddMonthlyReport';
+import DraftReportEdit from '../../screens/Appflow/draftreportedit/DraftReportEdit';
 const AppStack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const MyDrawer = (props) => {
@@ -84,6 +85,7 @@ const App = () => {
       <AppStack.Screen name={'Library'} component={Library} />
       <AppStack.Screen name={'Draft'} component={Draft} />
       <AppStack.Screen name={'DraftReportDetail'} component={DraftReportDetail} />
+      <AppStack.Screen name={'DraftReportEdit'} component={DraftReportEdit} />
       <AppStack.Screen name={'MonthlyReport'} component={MonthlyReport} />
       <AppStack.Screen name={'MonthlyReportDetail'} component={MonthlyReportDetail} />
       <AppStack.Screen name={'MonthlyReportEdit'} component={MonthlyReportEdit} />

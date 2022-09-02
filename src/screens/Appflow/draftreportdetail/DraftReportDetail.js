@@ -21,7 +21,7 @@ import { appImages } from '../../../assets/utilities';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import RightArrow from 'react-native-vector-icons/MaterialIcons';
 import { fontFamily } from '../../../constants/fonts';
-import { TouchableRipple } from 'react-native-paper';
+import { TouchableRipple, ActivityIndicator } from 'react-native-paper';
 import Plus from 'react-native-vector-icons/MaterialCommunityIcons';
 import LeftArrow from 'react-native-vector-icons/MaterialIcons';
 import STYLES from '../../../STYLES/STYLES';
@@ -29,10 +29,21 @@ import LeftIconCenterTextRightIcon from '../../../components/lefticoncentertectr
 import ModelResendEditDelete from '../../../components/modelresendeditdelete/ModelResendEditDelete';
 import ModelTwoButton from '../../../components/modeltwobutton/ModelTwoButton';
 import ModelOneButton from '../../../components/modelonebutton/ModelOneButton';
+import RNFetchBlob from 'rn-fetch-blob';
+import { baseUrl, ImageUrl } from '../../../route';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DraftReportDetail = (props) => {
-    const [activeSlide, setActiveSlide] = useState(0)
+    const { report, userData } = props.route.params;
 
+    const [stateActivityIndicator, setStateActivityIndicator] = useState(false)
+    // console.log('report')
+    // console.log(report)
+    // console.log(userData)
+    const [activeSlide, setActiveSlide] = useState(0)
+    const [correctTime, setCorrectTime] = useState('')
+    const [correctDate, setCorrectDate] = useState('')
     const [visibleResendEditDeleteModal, setVisibleResendEditDeleteModal] = useState(false);
     const showResendEditDeleteModal = () => setVisibleResendEditDeleteModal(true);
 
@@ -56,33 +67,244 @@ const DraftReportDetail = (props) => {
     const onDismissReportResendModal = useCallback(() => { setVisibleReportResendModal(false) }, [])
 
 
+
+
+
+
+
+
+
+    const getCorrectTime = () => {
+        const date = new Date(report.time)
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        let strTime = hours + ':' + minutes + ' ' + ampm;
+        setCorrectTime(strTime)
+    }
+    const getCorrectDate = () => {
+        let date = new Date(report.date);
+        let yyyy = date.getFullYear();
+        let mm = date.getMonth() + 1; // Months start at 0!
+        let dd = date.getDate();
+        if (dd < 10) dd = '0' + dd;
+        if (mm < 10) mm = '0' + mm;
+        date = dd + '-' + mm + '-' + yyyy;
+        setCorrectDate(date)
+    }
+    useEffect(() => {
+
+        getCorrectTime()
+        getCorrectDate()
+    }, [])
+
+
+
+
+    const deleteReport = async () => {
+
+
+
+
+
+        const value = JSON.parse(await AsyncStorage.getItem("draftReport1") || '[]')
+
+
+        console.log('value')
+        console.log(value)
+        if (value.length != 0) {
+
+            var reportArray = value.filter(o => {
+
+                // console.log(o.randomId)
+                // console.log(report.randomId)
+                // o.randomId != report.randomId
+                if (o.randomId != report.randomId)
+                    return o
+            })
+            console.log('reportArray')
+            console.log(reportArray)
+            if (reportArray.length != 0) {
+                try {
+                    AsyncStorage.setItem("draftReport1", JSON.stringify(
+
+
+                        reportArray))
+
+                    onDismissDeleteModal()
+                    props.navigation.goBack()
+                }
+                catch (err) {
+                    alert(err)
+                }
+            }
+            else {
+                try {
+                    AsyncStorage.setItem("draftReport1", JSON.stringify(
+
+
+                        []))
+                    props.navigation.goBack()
+                    onDismissDeleteModal()
+                }
+                catch (err) {
+                    alert(err)
+                }
+
+            }
+
+        }
+
+    }
+
+    const removeReportfromDraft = async () => {
+
+
+
+
+
+        const value = JSON.parse(await AsyncStorage.getItem("draftReport1") || '[]')
+
+
+        console.log('value')
+        console.log(value)
+        if (value.length != 0) {
+
+            var reportArray = value.filter(o => {
+
+                // console.log(o.randomId)
+                // console.log(report.randomId)
+                // o.randomId != report.randomId
+                if (o.randomId != report.randomId)
+                    return o
+            })
+            console.log('reportArray')
+            console.log(reportArray)
+            if (reportArray.length != 0) {
+                try {
+                    AsyncStorage.setItem("draftReport1", JSON.stringify(
+
+
+                        reportArray))
+
+                    onDismissResendEditDeleteModal()
+                    setStateActivityIndicator(false)
+                    showReportResendModal()
+                }
+                catch (err) {
+                    alert(err)
+                }
+            }
+            else {
+                try {
+                    AsyncStorage.setItem("draftReport1", JSON.stringify(
+
+
+                        []))
+
+                    onDismissResendEditDeleteModal()
+                    setStateActivityIndicator(false)
+                    showReportResendModal()
+                }
+                catch (err) {
+                    alert(err)
+                }
+
+            }
+
+        }
+
+    }
+
+
+
+
+
+    const resendReportApi = async () => {
+        setStateActivityIndicator(true)
+        await RNFetchBlob.fetch('POST',
+            `${ImageUrl}/upload-multiple-images`, {
+            Authorization: "Bearer access-token",
+            otherHeader: "foo",
+            'Content-Type': 'multipart/form-data',
+        }, report.images).then(async (response) => {
+            console.log(response.data)
+
+            if (response.data) {
+                console.log(response.data)
+
+                const imagesForDb = JSON.parse(response.data)
+
+
+
+
+                let b = {
+                    reportBy: userData._id,
+                    title: report.title,
+
+
+                    eventCategory: 'Public',
+                    description: report.description,
+                    location: report.location,
+                    date: report.date,
+                    time: report.time,
+                    images: imagesForDb.images
+                }
+
+                console.log(b)
+
+
+                await axios.post(`${baseUrl}/create-report`,
+                    b
+                ).then(response1 => {
+
+                    removeReportfromDraft()
+                    console.log('response1.data')
+                    console.log(response1.data)
+
+                }).catch(error => {
+                    setStateActivityIndicator(false)
+                    alert(error)
+                })
+            }
+        }).catch((error) => {
+            setStateActivityIndicator(false)
+            console.log(error)
+        })
+
+
+    }
+
     const [stateCards, setStateCCards] = useState([
-        {
-            _id: 1,
-            image: appImages.sliderImage,
+        // {
+        //     _id: 1,
+        //     image: appImages.sliderImage,
 
 
-        },
-        {
-            _id: 2,
-            image: appImages.sliderImage,
+        // },
+        // {
+        //     _id: 2,
+        //     image: appImages.sliderImage,
 
-        },
-        {
-            _id: 3,
-            image: appImages.sliderImage,
+        // },
+        // {
+        //     _id: 3,
+        //     image: appImages.sliderImage,
 
-        },
-        {
-            _id: 4,
-            image: appImages.sliderImage,
+        // },
+        // {
+        //     _id: 4,
+        //     image: appImages.sliderImage,
 
-        },
-        {
-            _id: 5,
-            image: appImages.sliderImage,
+        // },
+        // {
+        //     _id: 5,
+        //     image: appImages.sliderImage,
 
-        },
+        // },
     ]);
 
     const [secondlist, setSecondlist] = useState([
@@ -137,7 +359,7 @@ const DraftReportDetail = (props) => {
     const pagination = () => {
         return (
             <Pagination
-                dotsLength={stateCards.length}
+                dotsLength={report.images.length}
                 activeDotIndex={activeSlide}
                 containerStyle={{
                     // backgroundColor: 'red',
@@ -170,10 +392,10 @@ const DraftReportDetail = (props) => {
 
 
     const renderItem = ({ item, index }) => {
-
+        console.log(item.path)
         return (
             <ImageBackground
-                source={item.image}
+                source={{ uri: item.path }}
                 imageStyle={{
                     borderRadius: responsiveWidth(4.5),
                 }}
@@ -215,7 +437,7 @@ const DraftReportDetail = (props) => {
 
             <View style={{ marginTop: '3%' }}>
                 <Carousel
-                    data={stateCards}
+                    data={report.images}
                     renderItem={renderItem}
                     sliderWidth={responsiveWidth(100)}
                     itemWidth={responsiveWidth(100)}
@@ -239,13 +461,13 @@ const DraftReportDetail = (props) => {
 
             <View style={{ marginTop: '5%' }}>
                 <Text style={STYLES.fontSize16_1F2937_appTextBold}>
-                    Report Title Here
+                    {report.title}  {/* Report Title Here */}
                 </Text>
             </View>
 
             <View style={{ marginTop: '2%' }}>
                 <Text style={STYLES.fontSize12_1F2937_appTextMedium}>
-                    Department Name
+                    {userData.department}       {/* Department Name */}
                 </Text>
             </View>
 
@@ -269,7 +491,7 @@ const DraftReportDetail = (props) => {
                     </View>
                 </View>
                 <View style={{}}>
-                    <Text style={STYLES.fontSize12_000000_appTextSemiBold}>10:00 AM,   01-02-2022</Text>
+                    <Text style={STYLES.fontSize12_000000_appTextSemiBold}>{correctTime},   {correctDate}</Text>
                 </View>
             </View>
             <View style={{
@@ -287,7 +509,7 @@ const DraftReportDetail = (props) => {
                     flex: 1
                 }}>
                     <Text style={STYLES.fontSize12_1F2937_appTextSemiBold} numberOfLines={1}>
-                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et.
+                        {report.location}
                     </Text>
                 </View>
             </View>
@@ -306,7 +528,10 @@ const DraftReportDetail = (props) => {
             <View style={{ marginTop: '5%' }}>
                 <Text
                     style={STYLES.fontSize12_1F2937_appTextSemiBold}
-                    numberOfLines={8}>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et.</Text>
+                    numberOfLines={8}>
+                    {report.description}
+                    {/* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et.
+                       */}  </Text>
 
 
 
@@ -314,22 +539,30 @@ const DraftReportDetail = (props) => {
 
 
             <ModelResendEditDelete
-
+                stateActivityIndicator={stateActivityIndicator}
                 visible={visibleResendEditDeleteModal}
                 onDismiss={onDismissResendEditDeleteModal}
                 onPressResendReport={() => {
                     console.log('a')
-                    onDismissResendEditDeleteModal()
-                    showReportResendModal()
+                    resendReportApi()
+
+
                 }}
                 onPressEditReport={() => {
                     console.log('b')
                     onDismissResendEditDeleteModal()
+                    props.navigation.navigate("DraftReportEdit",
+                        {
+                            report: report,
+                            userData: userData
+
+                        })
                 }}
                 onPressDeleteReport={() => {
 
                     onDismissResendEditDeleteModal()
                     showDeleteModal()
+
                 }}
 
 
@@ -348,7 +581,8 @@ const DraftReportDetail = (props) => {
 
                 }}
                 methodOnRightSide={() => {
-                    onDismissDeleteModal()
+                    deleteReport()
+
                 }}
 
             />
@@ -360,7 +594,7 @@ const DraftReportDetail = (props) => {
                 onDismiss={onDismissReportResendModal}
                 onPress={() => {
                     onDismissReportResendModal()
-
+                    props.navigation.goBack()
                 }}
                 text1="Success"
                 text2="Report Sent Successfully"

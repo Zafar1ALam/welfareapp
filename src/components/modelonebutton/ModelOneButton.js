@@ -22,10 +22,12 @@ const ModelOneButton = props => {
                 alignItems: 'center',
                 marginBottom: '10%'
             }}>
-                <Text style={STYLES.fontSize22_32B768_appTextBold_Bold_700}>{props.text1}</Text>
+                <Text style={[STYLES.fontSize22_32B768_appTextBold_Bold_700,
+                { textAlign: 'center' }]}>{props.text1}</Text>
             </View>
             <View style={{ alignItems: 'center' }}>
-                <Text style={STYLES.fontSize16_1F2937_appTextRegular_86}>{props.text2}</Text>
+                <Text style={[STYLES.fontSize16_1F2937_appTextRegular_86,
+                { textAlign: "center" }]}>{props.text2}</Text>
             </View>
 
 

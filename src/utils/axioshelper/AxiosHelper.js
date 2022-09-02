@@ -16,7 +16,9 @@ export const getAsyncUserData = async () => {
 
         }
     } catch (error) {
+
         alert(error)
+        return {}
     }
 
 

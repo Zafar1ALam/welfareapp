@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, TouchableRipple } from 'react-native-paper';
+import { ActivityIndicator, Modal, TouchableRipple } from 'react-native-paper';
 import { Svgs } from '../../assets/svg/Svg';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -43,10 +43,25 @@ const ModelResendEditDelete = (props) => {
                 <>
                     <FontAwesome name="send" size={22}
                         color='#1F2937' />
+                    {props.stateActivityIndicator ?
+                        <View style={{
+                            alignItems: 'center',
+                            // backgroundColor: 'red',
+                            width: '90%',
+                        }}>
 
-                    <View style={{ marginLeft: '6%' }}>
-                        <Text style={STYLES.fontSize15_1F2937_appTextMedium}>Resend Report</Text>
-                    </View>
+                            <ActivityIndicator
+                                style={{ alignSelf: 'center' }}
+                                animating={props.stateActivityIndicator}
+                                color={'#32B768'} />
+                        </View>
+                        :
+
+                        <View style={{ marginLeft: '6%' }}>
+                            <Text style={STYLES.fontSize15_1F2937_appTextMedium}>Resend Report</Text>
+                        </View>
+
+                    }
                 </>
             </TouchableRipple>
             <View style={{

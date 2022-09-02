@@ -1,4 +1,3 @@
-
 import { StyleSheet, Text, View, ScrollView, StatusBar, ImageBackground, Image, TouchableOpacity, TouchableNativeFeedback, FlatList, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { responsiveHeight, responsiveWidth, responsiveFontSize } from 'react-native-responsive-dimensions';
@@ -28,25 +27,18 @@ import ModelOneButton from '../../../components/modelonebutton/ModelOneButton';
 import NetInfo from "@react-native-community/netinfo";
 
 
-const EditReporting = props => {
+const DraftReportEdit = props => {
 
     //console.log(props.user)
-    const { report } = props.route.params
+    const { report, userData } = props.route.params
 
-
+    console.log(userData)
 
     const [visibleAlertModal, setVisibleAlertModal] = useState(false);
 
     const showAlertModal = () => setVisibleAlertModal(true);
 
     const onDismissAlertModal = useCallback(() => { setVisibleAlertModal(false) }, [])
-
-
-    const [visibleNoInternetModal, setVisibleNoInternetModal] = useState(false);
-
-    const showNoInternetModal = () => setVisibleNoInternetModal(true);
-
-    const onDismissNoInternetModal = useCallback(() => { setVisibleNoInternetModal(false) }, [])
     // console.log('report')
     //console.log(report)
     const isFocused = useIsFocused()
@@ -59,7 +51,7 @@ const EditReporting = props => {
 
     const [image, setImage] = useState('');
     const [images, setImages] = useState(report.images);
-    const [getLocalImage, setLocalImage] = useState(false);
+    const [getLocalImage, setLocalImage] = useState(true);
     const [touchedimage, setTouchedimage] = useState('');
     const [visible3, setIsVisible3] = useState(false);
     const [visible, setVisible] = useState(false);
@@ -166,6 +158,65 @@ const EditReporting = props => {
     //     storeData(data)
     //   }
     // }
+
+
+    const deleteReport = async () => {
+
+
+
+
+
+        const value = JSON.parse(await AsyncStorage.getItem("draftReport1") || '[]')
+
+
+        console.log('value')
+        console.log(value)
+        if (value.length != 0) {
+
+            var reportArray = value.filter(o => {
+
+                // console.log(o.randomId)
+                // console.log(report.randomId)
+                // o.randomId != report.randomId
+                if (o.randomId != report.randomId)
+                    return o
+            })
+            console.log('reportArray')
+            console.log(reportArray)
+            if (reportArray.length != 0) {
+                try {
+                    AsyncStorage.setItem("draftReport1", JSON.stringify(
+
+
+                        reportArray))
+
+                    showAlertModal()
+
+                }
+                catch (err) {
+                    alert(err)
+                }
+            }
+            else {
+                try {
+                    AsyncStorage.setItem("draftReport1", JSON.stringify(
+
+
+                        []))
+                    showAlertModal()
+
+
+                }
+                catch (err) {
+                    alert(err)
+                }
+
+            }
+
+        }
+
+    }
+
     const onSubmitButtonPress = async () => {
         if (title == '') {
             setShowTitleHelperText(true)
@@ -219,10 +270,10 @@ const EditReporting = props => {
                         const imagesForDb = JSON.parse(response.data)
                         console.log(imagesForDb)
                         let a = {
-                            _id: report._id,
+                            reportBy: userData._id,
 
                             title: title,
-                            userType: props.user.userType,
+
                             department: props.user.department,
                             eventCategory: 'Public',
                             description: description,
@@ -232,55 +283,53 @@ const EditReporting = props => {
                             images: imagesForDb.images
                         }
                         console.log(a)
-                        await axios.put(`${baseUrl}/update-report`,
+                        await axios.post(`${baseUrl}/create-report`,
                             a
                         ).then(response1 => {
                             console.log('update report ' + response1.data)
                             console.log(response1.data)
-                            showAlertModal()
+                            deleteReport()
+
                             setIsLoading(false)
                             // console.log('completed')
 
                         }).catch(error => {
-                            console.log(error)
-                            showNoInternetModal()
+                            alert(error)
                         })
                     }
                 }).catch((error) => {
                     console.log(error)
-                    showNoInternetModal()
                 })
             }
-            else {
+            // else {
 
 
 
 
 
-                await axios.put(`${baseUrl}/update-report`, {
-                    _id: report._id,
+            //     await axios.post(`${baseUrl}/update-report`, {
+            //         _id: userData._id,
 
-                    title: title,
-                    userType: props.user.userType,
-                    department: props.user.department,
-                    eventCategory: 'Public',
-                    description: description,
-                    location: location,
-                    date: date,
-                    time: time,
-                    images: images
-                }).then(response => {
-                    //     console.log('update report ' + response.data)
-                    //     console.log(response.data)
-                    setIsLoading(false)
-                    // console.log('completed')
-                    showAlertModal()
-                }).catch(error => {
-                    console.log(error)
-                    showNoInternetModal()
-                })
+            //         title: title,
+            //         userType: props.user.userType,
+            //         department: props.user.department,
+            //         eventCategory: 'Public',
+            //         description: description,
+            //         location: location,
+            //         date: date,
+            //         time: time,
+            //         images: images
+            //     }).then(response => {
+            //         //     console.log('update report ' + response.data)
+            //         //     console.log(response.data)
+            //         setIsLoading(false)
+            //         // console.log('completed')
+            //         showAlertModal()
+            //     }).catch(error => {
+            //         alert(error)
+            //     })
 
-            }
+            // }
 
         }
     }
@@ -545,23 +594,13 @@ const EditReporting = props => {
 
 
             <ModelOneButton
-                visible={visibleNoInternetModal}
-                onDismiss={onDismissNoInternetModal}
-                text1="OOPS"
-                text2="No Internet Connection"
-                onPress={() => {
-                    onDismissNoInternetModal()
-                    props.navigation.navigate("ReportingByDepartment")
-                }}
-                buttonText="Ok" />
-            <ModelOneButton
                 visible={visibleAlertModal}
                 onDismiss={onDismissAlertModal}
                 text1="Success"
                 text2="Report Sent Successfully"
                 onPress={() => {
                     onDismissAlertModal()
-                    props.navigation.navigate("ReportingByDepartment")
+                    props.navigation.navigate("Draft")
                 }}
                 buttonText="Ok" />
         </KeyboardAvoidingView>
@@ -573,7 +612,7 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(EditReporting)
+export default connect(mapStateToProps)(DraftReportEdit)
 
 const styles = StyleSheet.create({
     container: {
