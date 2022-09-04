@@ -20,6 +20,7 @@ import LoaderImage from '../../../components/LoaderImage';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import ModelTwoButton from '../../../components/modeltwobutton/ModelTwoButton';
 import STYLES from '../../../STYLES/STYLES';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = props => {
 
@@ -340,6 +341,7 @@ const Home = props => {
   };
 
   const renderItem = ({ item, index }) => {
+    console.log(item)
     return (
       <View style={{
         backgroundColor: '#fff',
@@ -349,8 +351,8 @@ const Home = props => {
       }}>
 
         <ImageBackground
-          source={appImages.calender}
-          // { uri: `${baseUrl}/${item}` }
+          source=//{appImages.calender}
+          {{ uri: `${baseUrl}/${item}` }}
           imageStyle={{
             borderTopLeftRadius: 14,
             borderTopRightRadius: 14
@@ -395,11 +397,15 @@ const Home = props => {
         }}>
 
           <View >
-            <Text style={STYLES.fontSize14_1F2937_appTextMedium}>Title Here</Text>
+            <Text style={STYLES.fontSize14_1F2937_appTextMedium}>{eventsByDate[0].title}</Text>
           </View>
           <TouchableRipple style={{ flexDirection: 'row' }}
-            onPress={() =>
-              props.navigation.navigate('EventDetail', { eventDetail: eventsByDate[0], moreEvents: eventsByDate })}
+            onPress={() => {
+              console.log('sdfgfd')
+              props.navigation.navigate('EventDetail', {
+                eventDetail: eventsByDate[0], moreEvents: eventsByDate
+              })
+            }}
           >
             <>
               <View>
@@ -415,10 +421,14 @@ const Home = props => {
         <View style={{ marginHorizontal: '4%', marginTop: '1%' }}>
           <Text style={STYLES.fontSize8_000000_appTextRegular_74}
             numberOfLines={2}
-          >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et.</Text>
+          >
+
+            {eventsByDate[0].description}
+            {/* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et. */}
+          </Text>
         </View>
 
-      </View>
+      </View >
     );
   };
   const getEventsByDepartment = async () => {
@@ -428,7 +438,7 @@ const Home = props => {
       }
     }).then(response => {
 
-      //   console.log(response.data)
+      console.log(response.data)
       setEventsByDepartment(response.data)
     }).catch(error => {
       alert(error)
@@ -457,15 +467,32 @@ const Home = props => {
     }
   }
   useEffect(() => {
-    getEventsByDate()
-    console.log('asdfgfdsa')
+    const apiCall = async () => {
 
-    //  showAlertModal()
-    if (props.user !== null) {
-      showAlertModal()
-      getEventsByDepartment()
+      getEventsByDate()
+      // console.log('asdfgfdsa')
 
+
+      if (props.user !== null) {
+        getEventsByDepartment()
+        const value = await AsyncStorage.getItem("draftReport1")
+        if (value != null) {
+          const parseValue = JSON.parse(value)
+          if (parseValue.length != 0) {
+            showAlertModal()
+
+          }
+        }
+
+
+      }
+
+
+
+      // }
     }
+
+    apiCall()
   }, [])
   return (
     <View
@@ -538,7 +565,9 @@ const Home = props => {
 
               <View style={{ borderRadius: 14 }}>
                 <Carousel
-                  data={eventsByDate.length > 0 && eventsByDate[0].images}
+                  data={eventsByDate.length > 0 && eventsByDate[0]
+                    .images
+                  }
                   renderItem={renderItem}
                   sliderWidth={responsiveWidth(90)}
                   itemWidth={responsiveWidth(90)}
@@ -581,7 +610,7 @@ const Home = props => {
                   paddingLeft: responsiveWidth(5),
                   marginTop: responsiveHeight(3),
                 }}
-                data={eventsByDate}
+                data={eventsByDepartment}
                 renderItem={Firstrenderitem}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
@@ -703,7 +732,7 @@ const Home = props => {
         }}
         methodOnRightSide={() => {
           onDismissAlertModal()
-
+          props.navigation.navigate("Draft")
         }}
 
       />

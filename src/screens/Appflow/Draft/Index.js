@@ -40,28 +40,37 @@ const Draft = (props) => {
             setStateActivityIndicatorBody(true)
 
 
+            try {
 
 
-            const value = await AsyncStorage.getItem("draftReport1")
-            if (value != null) {
+                const value = JSON.parse(await AsyncStorage.getItem("draftReport1"))
 
-                const responseAsync = await getAsyncUserData()
+                if (value.length == 0) {
 
-                console.log(responseAsync)
-
-                setStateUserData(responseAsync)
-                console.log(value)
-                setSecondlist(JSON.parse(value))
-                setStateReportInDraft(true)
-                setStateActivityIndicatorBody(false)
+                    setStateReportInDraft(false)
+                    setStateActivityIndicatorBody(false)
 
 
+                }
+
+                else {
+
+
+
+                    const responseAsync = await getAsyncUserData()
+
+                    console.log(responseAsync)
+
+                    setStateUserData(responseAsync)
+                    console.log(value)
+                    setSecondlist(value)
+                    setStateReportInDraft(true)
+                    setStateActivityIndicatorBody(false)
+
+                }
             }
-
-            else {
-                setStateReportInDraft(false)
-                setStateActivityIndicatorBody(false)
-
+            catch (err) {
+                alert(err)
             }
         }
         apiCall()
@@ -233,10 +242,13 @@ const Draft = (props) => {
                         }}
                     />
                     :
+                    <View style={{
+                        flex: 1, justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
+                        <Text>No Report in Draft</Text>
 
-                    <Text>No Report in Draft</Text>
-
-
+                    </View>
 
             }
         </View>

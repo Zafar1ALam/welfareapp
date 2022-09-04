@@ -22,6 +22,8 @@ const EventsByDepartment = props => {
         department: props.user.department
       }
     }).then(response => {
+
+      console.log('response.data.department')
       console.log(response.data)
       setEventsByDepartment(response.data)
     }).catch(error => {

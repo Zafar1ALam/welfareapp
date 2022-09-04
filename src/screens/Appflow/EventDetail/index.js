@@ -141,11 +141,12 @@ const EventDetail = (props) => {
           height: responsiveHeight(28),
           // backgroundColor: 'red',
         }}>
+        {/*
         <View style={styles.bgcontainer}>
           <View>
             <Text style={styles.bgimptxt}>Important</Text>
           </View>
-          {/* <View style={styles.bgbelowcont}>
+          <View style={styles.bgbelowcont}>
             <Text style={styles.bgtitletxt}>{event.title}</Text>
             <Text style={styles.bgdesctxt} numberOfLines={2}>
               {event.description}
@@ -160,8 +161,9 @@ const EventDetail = (props) => {
               </View> 
             </TouchableOpacity>
           </View>
-          */}
+          
         </View>
+        */}
       </ImageBackground>
     );
   };

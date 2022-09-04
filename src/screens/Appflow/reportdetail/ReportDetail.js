@@ -10,7 +10,10 @@ import {
     TouchableNativeFeedback,
     FlatList,
 } from 'react-native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {
+    useState, useEffect, useCallback,
+    useRef
+} from 'react';
 import {
     responsiveHeight,
     responsiveWidth,
@@ -32,11 +35,18 @@ import LoaderButtonRnPaper from '../../../components/LoaderButton';
 import { ImageUrl } from '../../../route';
 import { Item } from 'react-native-paper/lib/typescript/components/List/List';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ViewShot from "react-native-view-shot";
+import RNFetchBlob from 'rn-fetch-blob';
 const ReportDetail = (props) => {
     const { reportItem } = props.route.params;
-    console.log('item')
-    console.log(reportItem)
 
+
+
+    var RNFS = require('react-native-fs');
+
+    console.log('item')
+    //  console.log(reportItem)
+    const viewRefScreenShot = useRef();
 
     const [stateUserId, setStateUserId] = useState('')
 
@@ -52,10 +62,10 @@ const ReportDetail = (props) => {
         try {
             if (value !== null) {
                 // We have data!!
-                console.log(value);
+                //      console.log(value);
                 let a = JSON.parse(value)
                 setStateUserId(a._id)
-                console.log(a._id)
+                //   console.log(a._id)
             }
         } catch (error) {
             alert(error)
@@ -167,9 +177,82 @@ const ReportDetail = (props) => {
             date: "02-22-2022"
         },
     ]);
+    const downloadPdf = (url) => {
+        // Main function to download the image
+
+        // To add the time suffix in filename
+        let date = new Date();
+        // Image URL which we want to download
+        let image_URL = url;
+        // Getting the extention of the file
+        let ext = getExtention(image_URL);
+        ext = '.' + ext[0];
+        // Get config and fs from RNFetchBlob
+        // config: To pass the downloading related options
+        // fs: Directory path where we want our image to download
+        const { config, fs } = RNFetchBlob;
+        let PictureDir = fs.dirs.DownloadDir;
+        let options = {
+            fileCache: true,
+            addAndroidDownloads: {
+                // Related to the Android only
+                useDownloadManager: true,
+                notification: true,
+                path:
+                    PictureDir +
+                    '/image_' +
+
+                    Math.floor(date.getTime() + date.getSeconds() / 2) +
+                    ext,
+                description: 'Image',
+            },
+        };
+        console.log('image_URL')
+        console.log(options)
+        console.log(image_URL)
+        console.log(typeof (image_URL))
+        config(options)
+            .fetch('GET', image_URL)
+            .then(res => {
+                // Showing alert after successful downloading
+                console.log('res -> ', JSON.stringify(res));
+                alert('Pdf file Downloaded Successfully.');
+            });
+    };
+
+
+    const getExtention = filename => {
+        // To get the file extension
+        return /[.]/.exec(filename) ?
+            /[^.]+$/.exec(filename) : undefined;
+    };
 
 
 
+    const captureAndShareScreenshot = () => {
+        viewRefScreenShot.current.capture().then((uri) => {
+            console.log(uri)
+            var path = RNFS.DownloadDirectoryPath + '/test.png';
+            console.log(path)
+
+            // RNFS.writeFile(path, 'Lorem ipsum dolor sit amet', 'utf8')
+            //     .then((success) => {
+            //         console.log('FILE WRITTEN!');
+            //     })
+            //     .catch((err) => {
+            //         console.log(err.message);
+            //     });
+
+            RNFS.moveFile(uri, path)
+                .then((success) => {
+                    console.log('file moved!');
+                })
+                .catch((err) => {
+                    console.log("Error: " + err.message);
+                });
+            //   downloadPdf(uri)
+        });
+    };
     const pagination = () => {
         return (
             <Pagination
@@ -248,118 +331,121 @@ const ReportDetail = (props) => {
                     downloadicon={true}
                     rightPress={() => {
                         console.log('SDFGFD')
+                        captureAndShareScreenshot()
                     }}
 
                 />
             </View>
-
-            <View style={{ marginTop: '3%' }}>
-                <Carousel
-                    data={reportItem.images}
-                    renderItem={renderItem}
-                    sliderWidth={responsiveWidth(100)}
-                    itemWidth={responsiveWidth(100)}
-                    pagingEnabled
-                    containerCustomStyle={{
-                        //   marginTop: responsiveHeight(1),
-                        alignSelf: 'center',
-                        paddingHorizontal: responsiveWidth(5),
-                    }}
-                    onSnapToItem={index => setActiveSlide(index)}
-                />
-                <View
-                    style={{
-                        alignSelf: 'center',
-                        marginTop: responsiveHeight(2.5),
-                        // backgroundColor: 'red',
-                    }}>
-                    {pagination()}
-                </View>
-            </View>
-
-            <View style={{ marginTop: '5%' }}>
-                <Text style={STYLES.fontSize16_1F2937_appTextBold}>
-                    {reportItem.title}   {/* Report Title Here */}
-                </Text>
-            </View>
-
-            <View style={{ marginTop: '2%' }}>
-                <Text style={STYLES.fontSize12_1F2937_appTextMedium}>
-                    {reportItem.department}   {/* Report Title Here */}           {/* Department Name */}
-                </Text>
-            </View>
-
-
-
-
-            <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginTop: '10%'
-            }}>
-                <View style={{ flexDirection: 'row' }}>
-                    <Image source={appImages.clock} style={{
-                        height: 13.3,
-                        width: 13.3
-                    }} />
-
-                    <View style={{ marginLeft: '10%' }}>
-                        <Text style={STYLES.fontSize12_000000_appTextMedium}>Date & Time</Text>
-
+            <ViewShot //onCapture={onCapture} //captureMode="mount"
+                ref={viewRefScreenShot}
+            >
+                <View style={{ marginTop: '3%' }}>
+                    <Carousel
+                        data={reportItem.images}
+                        renderItem={renderItem}
+                        sliderWidth={responsiveWidth(100)}
+                        itemWidth={responsiveWidth(100)}
+                        pagingEnabled
+                        containerCustomStyle={{
+                            //   marginTop: responsiveHeight(1),
+                            alignSelf: 'center',
+                            paddingHorizontal: responsiveWidth(5),
+                        }}
+                        onSnapToItem={index => setActiveSlide(index)}
+                    />
+                    <View
+                        style={{
+                            alignSelf: 'center',
+                            marginTop: responsiveHeight(2.5),
+                            // backgroundColor: 'red',
+                        }}>
+                        {pagination()}
                     </View>
                 </View>
-                <View style={{}}>
-                    <Text style={STYLES.fontSize12_000000_appTextSemiBold}>
-                        {correctTime}, {correctDate}
-                        {/* 10:00 AM,   01-02-2022 */}
 
-
+                <View style={{ marginTop: '5%' }}>
+                    <Text style={STYLES.fontSize16_1F2937_appTextBold}>
+                        {reportItem.title}   {/* Report Title Here */}
                     </Text>
                 </View>
-            </View>
-            <View style={{
-                marginTop: '5%',
-                flexDirection: 'row',
-                alignItems: 'center'
-            }}>
-                <Image source={appImages.location} style={{
-                    width: 11.3,
-                    height: 13.95
 
-                }} />
+                <View style={{ marginTop: '2%' }}>
+                    <Text style={STYLES.fontSize12_1F2937_appTextMedium}>
+                        {reportItem.department}   {/* Report Title Here */}           {/* Department Name */}
+                    </Text>
+                </View>
+
+
+
+
                 <View style={{
-                    marginLeft: '4%',
-                    flex: 1
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginTop: '10%'
                 }}>
-                    <Text style={STYLES.fontSize12_1F2937_appTextSemiBold} numberOfLines={1}>
-                        {reportItem.location}  {/* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et. */}
+                    <View style={{ flexDirection: 'row' }}>
+                        <Image source={appImages.clock} style={{
+                            height: 13.3,
+                            width: 13.3
+                        }} />
+
+                        <View style={{ marginLeft: '10%' }}>
+                            <Text style={STYLES.fontSize12_000000_appTextMedium}>Date & Time</Text>
+
+                        </View>
+                    </View>
+                    <View style={{}}>
+                        <Text style={STYLES.fontSize12_000000_appTextSemiBold}>
+                            {correctTime}, {correctDate}
+                            {/* 10:00 AM,   01-02-2022 */}
+
+
+                        </Text>
+                    </View>
+                </View>
+                <View style={{
+                    marginTop: '5%',
+                    flexDirection: 'row',
+                    alignItems: 'center'
+                }}>
+                    <Image source={appImages.location} style={{
+                        width: 11.3,
+                        height: 13.95
+
+                    }} />
+                    <View style={{
+                        marginLeft: '4%',
+                        flex: 1
+                    }}>
+                        <Text style={STYLES.fontSize12_1F2937_appTextSemiBold} numberOfLines={1}>
+                            {reportItem.location}  {/* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et. */}
+                        </Text>
+                    </View>
+                </View>
+
+
+                <View style={{
+                    marginTop: '2%',
+                    marginTop: '6%'
+                }}>
+                    <Text style={STYLES.fontSize13_1F2937_arialBold}>
+                        Description
                     </Text>
                 </View>
-            </View>
 
 
-            <View style={{
-                marginTop: '2%',
-                marginTop: '6%'
-            }}>
-                <Text style={STYLES.fontSize13_1F2937_arialBold}>
-                    Description
-                </Text>
-            </View>
-
-
-            <View style={{ marginTop: '5%' }}>
-                <Text
-                    style={STYLES.fontSize12_1F2937_appTextSemiBold}
-                    numberOfLines={8}>
-                    {reportItem.description}
-                    {/* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et. */}
-                </Text>
+                <View style={{ marginTop: '5%' }}>
+                    <Text
+                        style={STYLES.fontSize12_1F2937_appTextSemiBold}
+                        numberOfLines={8}>
+                        {reportItem.description}
+                        {/* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et. */}
+                    </Text>
 
 
 
-            </View>
-
+                </View>
+            </ViewShot>
             {stateUserId == reportItem.reportBy &&
                 <View style={{
                     marginTop: '10%',

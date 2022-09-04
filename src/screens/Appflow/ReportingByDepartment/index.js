@@ -14,7 +14,7 @@ import { baseUrl } from '../../../route';
 import { connect } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
 const ReportingByDepartment = (props) => {
-  console.log(props.user)
+  // console.log(props.user)
 
   const isFocused = useIsFocused();
   const [reports, setReports] = useState([])
@@ -63,14 +63,14 @@ const ReportingByDepartment = (props) => {
       ReportCategory: showEvents == true ? "Event" : "Meeting"
 
     }
-    console.log(b)
+    //console.log(b)
 
     await axios.get(`${baseUrl}/get-reports-of-subordinates`, {
       params: b
     }).then(response => {
-      console.log(response.data)
+      //  console.log(response.data)
       const data = response.data.reverse()
-      console.log(data)
+      //  console.log(data)
       setReports(data)
     }).catch(error => {
       alert(error)
