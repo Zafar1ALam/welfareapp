@@ -43,7 +43,7 @@ const Draft = (props) => {
             try {
 
 
-                const value = JSON.parse(await AsyncStorage.getItem("draftReport1"))
+                const value = JSON.parse(await AsyncStorage.getItem("draftReport1") || '[]')
 
                 if (value.length == 0) {
 
